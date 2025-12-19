@@ -45,5 +45,7 @@ namespace Dicom.Network
         Task<INetworkStream> GetNetorkStream(TcpClient tcpClient, string certificateName);
 
         Task<INetworkStream> GetNetorkStream(TcpClient tcpClient, X509Certificate certificate);
+
+        bool IsBound { get; }
     }
 }

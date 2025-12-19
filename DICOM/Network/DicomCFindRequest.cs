@@ -44,7 +44,14 @@ namespace Dicom.Network
         {
             get
             {
-                return Dataset.Get<DicomQueryRetrieveLevel>(DicomTag.QueryRetrieveLevel);
+                if (Dataset.Contains(DicomTag.QueryRetrieveLevel))
+                {
+                    return Dataset.Get<DicomQueryRetrieveLevel>(DicomTag.QueryRetrieveLevel);
+                }
+                else
+                {
+                    return DicomQueryRetrieveLevel.Worklist;
+                }
             }
             private set
             {
