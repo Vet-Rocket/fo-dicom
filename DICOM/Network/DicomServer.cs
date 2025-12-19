@@ -11,6 +11,8 @@ namespace Dicom.Network
     using System.Threading;
     using System.Threading.Tasks;
     using System.Security.Cryptography.X509Certificates;
+    using System.Net.Sockets;
+    using System.Net;
 
     /// <summary>
     /// Representation of a DICOM server.
@@ -211,51 +213,81 @@ namespace Dicom.Network
 
                 while (!this.cancellationSource.IsCancellationRequested)
                 {
-                    var tcpClient = await listener.AcceptTcpClientAsync(noDelay, this.cancellationSource.Token).ConfigureAwait(false);
-                    if(tcpClient != null)
+                    TcpClient tcpClient = null;
+                    try
                     {
-                        Task<INetworkStream> streamTask = listener.GetNetorkStream(tcpClient, certificate);
-                        _ = streamTask.ContinueWith(task =>
+                        tcpClient = await listener.AcceptTcpClientAsync(noDelay, this.cancellationSource.Token).ConfigureAwait(false);
+                        if (tcpClient != null)
                         {
-                            try
+                            Task<INetworkStream> streamTask = listener.GetNetorkStream(tcpClient, certificate);
+                            _ = streamTask.ContinueWith(task =>
                             {
-                                if (!task.IsFaulted)
+                                try
                                 {
-                                    var scp = this.CreateScp(task.Result);
-                                    if (this.Options != null)
+                                    if (!task.IsFaulted)
                                     {
-                                        scp.Options = this.Options;
-                                    }
-                                    lock (_clientLocker)
-                                    {
-                                        this.clients.Add(scp);
+                                        var scp = this.CreateScp(task.Result);//move options to constructor??
+                                        if (this.Options != null)
+                                        {
+                                            scp.Options = this.Options;
+                                        }
+                                        lock (_clientLocker)
+                                        {
+                                            this.clients.Add(scp);
+                                        }
                                     }
                                 }
-                            }
-                            catch(DicomNetworkException dnx)
-                            {
-                                this.Logger.Error("Error getting network stream: " + dnx.Message);
-                            }
-                        });
+                                catch (DicomNetworkException dnx)
+                                {
+                                    this.Logger.Error("Error getting network stream: " + dnx.Message);
+                                }
+                                catch(Exception ex)
+                                {
+                                    this.Logger.Error("Error creating SCP: " + ex.Message);
+                                    try
+                                    {
+                                        tcpClient?.Dispose();
+                                    }
+                                    catch (Exception tx)
+                                    {
+                                        this.Logger.Error("Error disposing TcpClient: " + tx.Message);
+                                    }
+                                    if (listener == null || !listener.IsBound)
+                                    {
+                                        this.Logger.Error("Listener is not bound.");
+                                        throw;
+                                    }
+                                }
+                            });
+                        }
                     }
-                    //var networkStream =
-                    //    await listener.AcceptNetworkStreamAsync(
-                    //        this.certificateName,
-                    //        noDelay,
-                    //        this.cancellationSource.Token).ConfigureAwait(false);
-
-                    //if (networkStream != null)
-                    //{
-                    //    var scp = this.CreateScp(networkStream);
-                    //    if (this.Options != null)
-                    //    {
-                    //        scp.Options = this.Options;
-                    //    }
-                    //    lock (_clientLocker)
-                    //    {
-                    //        this.clients.Add(scp);
-                    //    }
-                    //}
+                    catch (SocketException ex)
+                    {
+                        // This catches connection errors
+                        if (ex.SocketErrorCode == SocketError.ConnectionReset)
+                        {
+                            this.Logger.Error("Connection was forcibly closed by remote host.");
+                        }
+                        else
+                        {
+                            this.Logger.Error($"SocketException: {ex.Message}");
+                        }
+                    }
+                    catch (ObjectDisposedException odx)
+                    {
+                        // Thrown if listener is stopped during AcceptTcpClient
+                        this.Logger.Error("Listener has been stopped.",odx);
+                        break;
+                    }
+                    catch(Exception otherEx)
+                    {
+                        this.Logger.Error("Error accepting TCP client: " + otherEx.Message);
+                    }
+                    if (listener == null || !listener.IsBound)
+                    {
+                        this.Logger.Error("Listener is not bound.");
+                        break;
+                    }
                 }
 
                 listener.Stop();
@@ -276,6 +308,7 @@ namespace Dicom.Network
                     debugMsg += " - " + e.InnerException.Message;
                 }
                 debugMsg += "\n\n" + e.StackTrace;
+                this.Logger.Debug(debugMsg);
                 this.Stop();
                 this.Exception = e;
             }

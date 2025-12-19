@@ -24,6 +24,15 @@ namespace Dicom.Network
 
         private readonly object _locker = new object();
 
+        public bool IsBound{
+            get
+            {
+                if(listener == null) return false;
+                if(listener.Server == null) return false;
+                return listener.Server.IsBound;
+            }
+        }
+
         #endregion
 
         #region CONSTRUCTORS

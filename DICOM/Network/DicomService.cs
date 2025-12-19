@@ -285,7 +285,7 @@ namespace Dicom.Network
                 _network?.Dispose();//this might not be "owned" by the DicomService... TBD
                 try
                 {
-                    nStream?.Dispose();//not disposed by INetworkStream
+                    nStream?.Dispose();//not disposed by INetworkStream, but maybe by tcpClient?
                 }
                 catch { }
                 _pduQueueWatcher?.Dispose();
@@ -898,6 +898,7 @@ namespace Dicom.Network
                                 file.FileMetaInfo.TransferSyntax = pc.AcceptedTransferSyntax;
                                 file.FileMetaInfo.ImplementationClassUID = Association.RemoteImplementationClassUID;
                                 file.FileMetaInfo.ImplementationVersionName = Association.RemoteImplementationVersion;
+                                //this may be nonstandard, but convenient
                                 file.FileMetaInfo.SourceApplicationEntityTitle = Association.CallingAE;
                                 file.Dataset.Add(DicomTag.SOPClassUID, pc.AbstractSyntax);
                                 file.Dataset.Add(DicomTag.SOPInstanceUID, sopUid);
@@ -1264,7 +1265,7 @@ namespace Dicom.Network
                 DicomRequest dreq = dimse as DicomRequest;
                 lock (_receiveLock) {
                     int totalOutstanding = _receivedProcessing.Count + _receivedQueue.Count;
-                    if (totalOutstanding >= Association.MaxAsyncOpsPerformed)
+                    if (Association.MaxAsyncOpsPerformed > 0 && totalOutstanding >= Association.MaxAsyncOpsPerformed)
                     {
                         SendFailureResponse(dreq);
                     }

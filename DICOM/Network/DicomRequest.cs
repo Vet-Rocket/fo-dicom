@@ -18,10 +18,20 @@ namespace Dicom.Network
 
         private static readonly object _lock = new object();
 
+        private volatile bool _IsCancelled = false;
+
         /// <summary>Delegate to be executed immediately before sending the request.</summary>
         public RequestDelegate OnBeforeSendRequest;
 
         #endregion
+
+        public bool IsCancelled
+        {
+            get
+            {
+                return _IsCancelled;
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DicomRequest"/> class.
@@ -88,6 +98,11 @@ namespace Dicom.Network
                 if (_messageId == ushort.MaxValue) _messageId = 1;
                 return _messageId++;
             }
+        }
+
+        internal void SetCancelled()
+        {
+            _IsCancelled = true;
         }
 
         /// <summary>
