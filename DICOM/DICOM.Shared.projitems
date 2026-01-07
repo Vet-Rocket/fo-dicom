@@ -177,6 +177,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Network\DicomAssociation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\DicomAssociationAbortedException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\DicomAssociationRejectedException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Network\DicomCCancelRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\DicomCEchoProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\DicomCEchoRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Network\DicomCEchoResponse.cs" />

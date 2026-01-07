@@ -74,8 +74,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DICOM.Legacy", "Legacy\DICO
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DICOM.Portable", "DICOM.Platform\Portable\DICOM.Portable.csproj", "{A661D347-CF7D-4F36-8101-0544AE85EEEC}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "RocketPACS.Model", "VetRocket\RocketPACS.Model\RocketPACS.Model.shproj", "{45269003-4C6A-4A3F-AA33-01D37359F5F9}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -318,11 +316,10 @@ Global
 		{6D0CE6E2-BC02-4E83-8697-18B47CBEF842} = {01F74C31-F62B-46F0-9F64-0AA83D14FA21}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {B13A243A-8191-4363-BFC6-E01D1966B7D5}
 		BuildVersion_UseGlobalSettings = True
+		SolutionGuid = {B13A243A-8191-4363-BFC6-E01D1966B7D5}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		VetRocket\RocketPACS.Model\RocketPACS.Model.projitems*{45269003-4c6a-4a3f-aa33-01d37359f5f9}*SharedItemsImports = 13
 		DICOM\DICOM.Shared.projitems*{59b38770-d2e7-40b9-8d27-a20691f1caa9}*SharedItemsImports = 4
 		DICOM\DICOM.Shared.projitems*{a661d347-cf7d-4f36-8101-0544ae85eeec}*SharedItemsImports = 4
 		DICOM\DICOM.Shared.projitems*{f9539369-1ad0-43b0-a35c-b82f6755c247}*SharedItemsImports = 13
