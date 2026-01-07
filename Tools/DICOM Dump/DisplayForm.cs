@@ -47,8 +47,12 @@ namespace Dicom.Dump
                         try
                         {
                             DicomDataset dataset = _file.Dataset;
-                            //DicomPixelData.FixBrokenCompression(dataset);
-                            _image = new DicomImage(_file.Dataset);
+                            //temporary
+                            //dataset = dataset.Clone();
+                            //dataset.AddOrUpdate(DicomTag.BitsStored, (ushort)8);
+                            //dataset.AddOrUpdate(DicomTag.BitsAllocated, (ushort)8);
+                            //dataset.AddOrUpdate(DicomTag.HighBit, (ushort)7);
+                            _image = new DicomImage(dataset);
                             _grayscale = !_image.PhotometricInterpretation.IsColor;
                             if (_grayscale)
                             {

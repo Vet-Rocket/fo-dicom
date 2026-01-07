@@ -351,7 +351,9 @@ namespace Dicom.Dump
 
         private void ChangeSyntax(DicomTransferSyntax syntax, DicomCodecParams param = null)
         {
+            DateTime startUtc = DateTime.UtcNow;
             var file = _file.Clone(syntax, param);
+            var totalMs = (DateTime.UtcNow - startUtc).TotalMilliseconds;
             OpenFile(file);
         }
 
