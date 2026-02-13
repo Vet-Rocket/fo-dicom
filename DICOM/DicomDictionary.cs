@@ -75,7 +75,7 @@ namespace Dicom
 
         private ConcurrentDictionary<DicomTag, DicomDictionaryEntry> _entries;
 
-        private readonly ConcurrentDictionary<string, DicomTag> _keywords;//lower case, handle as case insensitive
+        private readonly ConcurrentDictionary<string, DicomDictionaryEntry> _keywords;//lower case, handle as case insensitive
 
         private object _maskedLock;
         private List<DicomDictionaryEntry> _masked;
@@ -91,7 +91,7 @@ namespace Dicom
             _creators = new ConcurrentDictionary<string, DicomPrivateCreator>();
             _private = new ConcurrentDictionary<DicomPrivateCreator, DicomDictionary>();
             _entries = new ConcurrentDictionary<DicomTag, DicomDictionaryEntry>();
-            _keywords = new ConcurrentDictionary<string, DicomTag>(StringComparer.Ordinal);
+            _keywords = new ConcurrentDictionary<string, DicomDictionaryEntry>(StringComparer.OrdinalIgnoreCase);
             _masked = new List<DicomDictionaryEntry>();
             _maskedLock = new object();
             _maskedNeedsSort = false;
@@ -101,7 +101,7 @@ namespace Dicom
         {
             _privateCreator = creator;
             _entries = new ConcurrentDictionary<DicomTag, DicomDictionaryEntry>();
-            _keywords = new ConcurrentDictionary<string, DicomTag>(StringComparer.Ordinal);
+            _keywords = new ConcurrentDictionary<string, DicomDictionaryEntry>(StringComparer.OrdinalIgnoreCase);
             _masked = new List<DicomDictionaryEntry>();
             _maskedLock = new object();
             _maskedNeedsSort = false;
@@ -310,11 +310,11 @@ namespace Dicom
         /// </summary>
         /// <param name="keyword">The attribute keyword that we look for.</param>
         /// <returns>A matching DicomTag or null if none is found.</returns>
-        public DicomTag this[string keyword]
+        public DicomDictionaryEntry this[string keyword]
         {
             get
             {
-                if (_keywords.TryGetValue(keyword.ToLower(), out DicomTag result))
+                if (_keywords.TryGetValue(keyword, out DicomDictionaryEntry result))
                 {
                     return result;
                 }
@@ -349,16 +349,21 @@ namespace Dicom
 
             if(_keywords.ContainsKey(entry.Keyword.ToLower()))
             {
-                if (_keywords[entry.Keyword.ToLower()] != entry.Tag)
+                if (_keywords[entry.Keyword].Tag != entry.Tag)
                 {
                     throw new ArgumentNullException("keyword", "Keyword '" + entry.Keyword + "' already exists in dictionary");
+                }
+                else
+                {
+                    //what if it's a different dictionary entry? TBD
+                    return;
                 }
             }
             if (entry.MaskTag == null)
             {
                 // allow overwriting of existing entries
                 _entries[entry.Tag] = entry;
-               if(!entry.Tag.IsPrivate) _keywords[entry.Keyword.ToLower()] = entry.Tag;
+               if(!entry.Tag.IsPrivate) _keywords[entry.Keyword] = entry;
             }
             else
             {
@@ -366,7 +371,7 @@ namespace Dicom
                 {
                     _masked.Add(entry);
                     _maskedNeedsSort = true;
-                    if (!entry.Tag.IsPrivate) _keywords[entry.Keyword.ToLower()] = entry.Tag;
+                    if (!entry.Tag.IsPrivate) _keywords[entry.Keyword] = entry;
                 }
             }
         }
