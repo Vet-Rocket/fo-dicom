@@ -445,5 +445,50 @@ namespace Dicom.Serialization
             var x = BuildAllTypesNullDataset_();
             VerifyJsonTripleTrip(x);
         }
+
+        [Fact]
+        public void SerializeDeeplyNestedSequences_ThrowsJsonSerializationException()
+        {
+            // Create a dataset with more than 100 levels of nesting
+            var deepDataset = new DicomDataset();
+            DicomDataset current = deepDataset;
+            
+            for (int i = 0; i < 101; i++)
+            {
+                var seq = new DicomSequence(DicomTag.ReferencedImageSequence);
+                var nestedDataset = new DicomDataset();
+                seq.Items.Add(nestedDataset);
+                current.Add(seq);
+                current = nestedDataset;
+            }
+
+            var exception = Assert.Throws<JsonSerializationException>(() => 
+                JsonConvert.SerializeObject(deepDataset, new JsonDicomConverter()));
+            Assert.Contains("nesting depth exceeds maximum", exception.Message);
+        }
+
+        [Fact]
+        public void DeserializeDeeplyNestedJson_ThrowsJsonSerializationException()
+        {
+            // Build a deeply nested JSON string with more than 100 levels
+            var json = new System.Text.StringBuilder();
+            json.Append("{");
+            
+            for (int i = 0; i < 101; i++)
+            {
+                json.Append("\"00081140\":{\"vr\":\"SQ\",\"Value\":[{");
+            }
+            
+            // Close all the nested objects
+            for (int i = 0; i < 101; i++)
+            {
+                json.Append("}]}");
+            }
+            json.Append("}");
+
+            var exception = Assert.Throws<JsonSerializationException>(() => 
+                JsonConvert.DeserializeObject<DicomDataset>(json.ToString(), new JsonDicomConverter()));
+            Assert.Contains("nesting depth exceeds maximum", exception.Message);
+        }
     }
 }
