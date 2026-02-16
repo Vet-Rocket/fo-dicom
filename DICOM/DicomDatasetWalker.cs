@@ -104,6 +104,15 @@ namespace Dicom
     /// </summary>
     public class DicomDatasetWalker
     {
+        #region Constants
+
+        /// <summary>
+        /// Maximum allowed nesting depth for DICOM sequences to prevent stack overflow.
+        /// </summary>
+        private const int MaxNestingDepth = 100;
+
+        #endregion
+
         #region State Items
 
         private class BeginDicomSequenceItem : DicomItem
@@ -249,6 +258,23 @@ namespace Dicom
         /// <param name="items">Destination of population.</param>
         private static void BuildWalkQueue(IEnumerable<DicomItem> dataset, Queue<DicomItem> items)
         {
+            BuildWalkQueue(dataset, items, 0);
+        }
+
+        /// <summary>
+        /// Populate the <paramref name="items"/> queue.
+        /// </summary>
+        /// <param name="dataset">Source of population.</param>
+        /// <param name="items">Destination of population.</param>
+        /// <param name="depth">Current nesting depth.</param>
+        private static void BuildWalkQueue(IEnumerable<DicomItem> dataset, Queue<DicomItem> items, int depth)
+        {
+            if (depth > MaxNestingDepth)
+            {
+                throw new DicomDataException(
+                    string.Format("DICOM dataset nesting depth exceeds maximum allowed depth of {0}. This may indicate a circular reference or extremely deep nesting.", MaxNestingDepth));
+            }
+
             foreach (var item in dataset)
             {
                 if (item is DicomElement)
@@ -272,7 +298,7 @@ namespace Dicom
                     foreach (var sqi in sq)
                     {
                         items.Enqueue(new BeginDicomSequenceItem(sqi));
-                        BuildWalkQueue(sqi, items);
+                        BuildWalkQueue(sqi, items, depth + 1);
                         items.Enqueue(new EndDicomSequenceItem());
                     }
                     items.Enqueue(new EndDicomSequence());
