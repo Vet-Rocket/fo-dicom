@@ -90,6 +90,27 @@ namespace Dicom
             Assert.Equal(100.0, this.walkerImpl.maxFinalCumulativeMetersetWeight);
         }
 
+        [Fact]
+        public void Walk_DeeplyNestedSequences_ThrowsDicomDataException()
+        {
+            // Create a dataset with more than 100 levels of nesting
+            var deepDataset = new DicomDataset();
+            DicomDataset current = deepDataset;
+            
+            for (int i = 0; i < 101; i++)
+            {
+                var seq = new DicomSequence(DicomTag.ReferencedImageSequence);
+                var nestedDataset = new DicomDataset();
+                seq.Items.Add(nestedDataset);
+                current.Add(seq);
+                current = nestedDataset;
+            }
+
+            var deepWalker = new DicomDatasetWalker(deepDataset);
+            var exception = Assert.Throws<DicomDataException>(() => deepWalker.Walk(this.walkerImpl));
+            Assert.Contains("nesting depth exceeds maximum", exception.Message);
+        }
+
         #endregion
 
         #region Mock classes

@@ -18,6 +18,11 @@ namespace Dicom.Serialization
     /// </summary>
     public class JsonDicomConverter : JsonConverter
     {
+        /// <summary>
+        /// Maximum allowed nesting depth for DICOM sequences to prevent stack overflow during JSON serialization.
+        /// </summary>
+        private const int MaxNestingDepth = 100;
+
         private readonly bool _writeTagsAsKeywords;
 
         /// <summary>
@@ -39,6 +44,24 @@ namespace Dicom.Serialization
         /// <param name="serializer">The calling serializer.</param>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
+            WriteJson(writer, value, serializer, 0);
+        }
+
+        /// <summary>
+        /// Writes the JSON representation of the object with depth tracking.
+        /// </summary>
+        /// <param name="writer">The <see cref="T:Newtonsoft.Json.JsonWriter"/> to write to.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="serializer">The calling serializer.</param>
+        /// <param name="depth">Current nesting depth.</param>
+        private void WriteJson(JsonWriter writer, object value, JsonSerializer serializer, int depth)
+        {
+            if (depth > MaxNestingDepth)
+            {
+                throw new JsonSerializationException(
+                    string.Format("DICOM JSON nesting depth exceeds maximum allowed depth of {0}. This may indicate a circular reference or extremely deep nesting.", MaxNestingDepth));
+            }
+
             if (value == null)
             {
                 writer.WriteNull();
@@ -64,7 +87,7 @@ namespace Dicom.Serialization
                                item.Tag.DictionaryEntry.MaskTag.Mask != 0xffffffff);
                 if (_writeTagsAsKeywords && !unknown) writer.WritePropertyName(item.Tag.DictionaryEntry.Keyword);
                 else writer.WritePropertyName(item.Tag.Group.ToString("X4") + item.Tag.Element.ToString("X4"));
-                WriteJsonDicomItem(writer, item, serializer);
+                WriteJsonDicomItem(writer, item, serializer, depth);
             }
             writer.WriteEndObject();
         }
@@ -82,6 +105,29 @@ namespace Dicom.Serialization
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
             JsonSerializer serializer)
         {
+            return ReadJson(reader, objectType, existingValue, serializer, 0);
+        }
+
+        /// <summary>
+        /// Reads the JSON representation of the object with depth tracking.
+        /// </summary>
+        /// <param name="reader">The <see cref="T:Newtonsoft.Json.JsonReader"/> to read from.</param>
+        /// <param name="objectType">Type of the object.</param>
+        /// <param name="existingValue">The existing value of object being read.</param>
+        /// <param name="serializer">The calling serializer.</param>
+        /// <param name="depth">Current nesting depth.</param>
+        /// <returns>
+        /// The object value.
+        /// </returns>
+        private object ReadJson(JsonReader reader, Type objectType, object existingValue,
+            JsonSerializer serializer, int depth)
+        {
+            if (depth > MaxNestingDepth)
+            {
+                throw new JsonSerializationException(
+                    string.Format("DICOM JSON nesting depth exceeds maximum allowed depth of {0}. This may indicate a circular reference or extremely deep nesting.", MaxNestingDepth));
+            }
+
             var dataset = new DicomDataset();
             if (reader.TokenType == JsonToken.Null) return null;
             if (reader.TokenType != JsonToken.StartObject) throw new JsonReaderException("Malformed DICOM json");
@@ -91,7 +137,7 @@ namespace Dicom.Serialization
                 var tagstr = (string)reader.Value;
                 DicomTag tag = ParseTag(tagstr);
                 reader.Read();
-                var item = ReadJsonDicomItem(tag, reader, serializer);
+                var item = ReadJsonDicomItem(tag, reader, serializer, depth);
                 dataset.Add(item);
                 reader.Read();
             }
@@ -248,7 +294,7 @@ namespace Dicom.Serialization
 
         #region WriteJson helpers
 
-        private void WriteJsonDicomItem(JsonWriter writer, DicomItem item, JsonSerializer serializer)
+        private void WriteJsonDicomItem(JsonWriter writer, DicomItem item, JsonSerializer serializer, int depth)
         {
             writer.WriteStartObject();
             writer.WritePropertyName("vr");
@@ -260,7 +306,7 @@ namespace Dicom.Serialization
                     WriteJsonPersonName(writer, (DicomPersonName)item);
                     break;
                 case "SQ":
-                    WriteJsonSequence(writer, (DicomSequence)item, serializer);
+                    WriteJsonSequence(writer, (DicomSequence)item, serializer, depth);
                     break;
                 case "OB":
                 case "OD":
@@ -429,14 +475,14 @@ namespace Dicom.Serialization
             }
         }
 
-        private void WriteJsonSequence(JsonWriter writer, DicomSequence seq, JsonSerializer serializer)
+        private void WriteJsonSequence(JsonWriter writer, DicomSequence seq, JsonSerializer serializer, int depth)
         {
             if (seq.Items.Count != 0)
             {
                 writer.WritePropertyName("Value");
                 writer.WriteStartArray();
 
-                foreach (var child in seq.Items) WriteJson(writer, child, serializer);
+                foreach (var child in seq.Items) WriteJson(writer, child, serializer, depth + 1);
 
                 writer.WriteEndArray();
             }
@@ -472,7 +518,7 @@ namespace Dicom.Serialization
 
         #region ReadJson helpers
 
-        private DicomItem ReadJsonDicomItem(DicomTag tag, JsonReader reader, JsonSerializer serializer)
+        private DicomItem ReadJsonDicomItem(DicomTag tag, JsonReader reader, JsonSerializer serializer, int depth)
         {
             if (reader.TokenType != JsonToken.StartObject) throw new JsonReaderException("Malformed DICOM json");
             reader.Read();
@@ -495,7 +541,7 @@ namespace Dicom.Serialization
                     data = ReadJsonOX(reader);
                     break;
                 case "SQ":
-                    data = ReadJsonSequence(reader, serializer);
+                    data = ReadJsonSequence(reader, serializer, depth);
                     break;
                 case "PN":
                     data = ReadJsonPersonName(reader);
@@ -639,7 +685,7 @@ namespace Dicom.Serialization
             }
         }
 
-        private DicomDataset[] ReadJsonSequence(JsonReader reader, JsonSerializer serializer)
+        private DicomDataset[] ReadJsonSequence(JsonReader reader, JsonSerializer serializer, int depth)
         {
             reader.Read();
             if (reader.TokenType == JsonToken.PropertyName && (string)reader.Value == "Value")
@@ -650,7 +696,7 @@ namespace Dicom.Serialization
                 var childItems = new List<DicomDataset>();
                 while (reader.TokenType == JsonToken.StartObject || reader.TokenType == JsonToken.Null)
                 {
-                    childItems.Add((DicomDataset)ReadJson(reader, typeof (DicomDataset), null, serializer));
+                    childItems.Add((DicomDataset)ReadJson(reader, typeof (DicomDataset), null, serializer, depth + 1));
                     reader.Read();
                 }
                 var data = childItems.ToArray();
