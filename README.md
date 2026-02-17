@@ -158,3 +158,5 @@ that were previously included in the *Examples* sub-folder of the VS solutions.
 
 ### License
 This library is licensed under the [Microsoft Public License (MS-PL)](http://opensource.org/licenses/MS-PL). See [License.txt](License.txt) for more information.
+
+For a comprehensive list of all dependencies and their licenses, see [DEPENDENCIES.md](DEPENDENCIES.md).
