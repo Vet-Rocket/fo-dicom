@@ -7,6 +7,33 @@ This document lists all libraries that the fo-dicom project depends on and their
 
 ---
 
+## Quick Reference Summary
+
+| Dependency | Version | License | Usage | Certainty |
+|------------|---------|---------|-------|-----------|
+| CSJ2K | 2.0.0.1 | BSD 2-Clause | Used | Not Sure* |
+| Portable.LibJpeg.NET | 1.5.1.1 | BSD 3-Clause | Used | Not Sure* |
+| Newtonsoft.Json | 9.0.1 | MIT | Used | 100% |
+| NLog | 4.4.1 | BSD 3-Clause | Used | 100% |
+| log4net | 2.0.7 | Apache 2.0 | Used | 100% |
+| Serilog | 2.3.0 | Apache 2.0 | Used | 100% |
+| MetroLog | 1.0.1 | MIT | Used | Not Sure* |
+| xunit (all packages) | 2.0.0-2.1.0 | Apache 2.0 | Used (Tests) | 100% |
+| NETStandard.Library | 1.6.1 | MIT | Used (.NET Core) | 100% |
+| System.* packages | 4.3.0 | MIT | Used (.NET Core) | 100% |
+| Microsoft.NETCore.UniversalWindowsPlatform | 5.2.2 | MIT | May be Used (UWP) | 100% |
+| libijg (8/12/16-bit) | N/A (embedded) | IJG License | Used (Native) | 100% |
+| OpenJPEG | N/A (embedded) | BSD 2-Clause | Used (Native) | 100% |
+| CharLS | N/A (embedded) | BSD 3-Clause | Used (Native) | 100% |
+| Unity | N/A | Proprietary | May be Used | 100% |
+| .NET Framework | N/A | Microsoft EULA | May be Used | 100% |
+| Mono | N/A | MIT | May be Used | 100% |
+| Xamarin | N/A | MIT | May be Used | 100% |
+
+\* License type is documented based on common knowledge but could not be verified from NuGet package metadata due to network restrictions during audit.
+
+---
+
 ## NuGet Package Dependencies
 
 ### Core Dependencies (Used)
