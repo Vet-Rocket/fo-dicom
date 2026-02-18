@@ -1,0 +1,537 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: fo-dicom Software Bill of Materials
+DocumentNamespace: https://github.com/Vet-Rocket/fo-dicom/sbom/3.0.0.30
+Creator: Tool: manual
+Creator: Organization: Vet Rocket LLC
+Created: 2026-02-18T00:00:00Z
+
+##### Package: fo-dicom
+
+PackageName: fo-dicom
+SPDXID: SPDXRef-Package-fo-dicom
+PackageVersion: 3.0.0.30
+PackageSupplier: Organization: fo-dicom contributors
+PackageDownloadLocation: https://github.com/Vet-Rocket/fo-dicom
+FilesAnalyzed: false
+PackageHomePage: https://github.com/fo-dicom/fo-dicom
+PackageLicenseConcluded: MS-PL
+PackageLicenseDeclared: MS-PL
+PackageCopyrightText: Copyright (c) 2012-2025 fo-dicom contributors
+PackageSummary: Fellow Oak DICOM for .NET, .NET Core, Universal Windows, Android, iOS, Mono and Unity
+
+##### NuGet Package Dependencies
+
+##### Package: CSJ2K
+
+PackageName: CSJ2K
+SPDXID: SPDXRef-Package-CSJ2K
+PackageVersion: 2.0.0.1
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: https://www.nuget.org/packages/CSJ2K/2.0.0.1
+FilesAnalyzed: false
+PackageLicenseConcluded: BSD-2-Clause
+PackageLicenseDeclared: BSD-2-Clause
+PackageCopyrightText: NOASSERTION
+PackageSummary: C# port of OpenJPEG JPEG 2000 library
+
+Relationship: SPDXRef-Package-fo-dicom DEPENDS_ON SPDXRef-Package-CSJ2K
+
+##### Package: Portable.LibJpeg.NET
+
+PackageName: Portable.LibJpeg.NET
+SPDXID: SPDXRef-Package-Portable-LibJpeg-NET
+PackageVersion: 1.5.1.1
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: https://www.nuget.org/packages/Portable.LibJpeg.NET/1.5.1.1
+FilesAnalyzed: false
+PackageLicenseConcluded: BSD-3-Clause
+PackageLicenseDeclared: BSD-3-Clause
+PackageCopyrightText: NOASSERTION
+PackageSummary: Managed JPEG codec implementation
+
+Relationship: SPDXRef-Package-fo-dicom DEPENDS_ON SPDXRef-Package-Portable-LibJpeg-NET
+
+##### Package: Newtonsoft.Json
+
+PackageName: Newtonsoft.Json
+SPDXID: SPDXRef-Package-Newtonsoft-Json
+PackageVersion: 9.0.1
+PackageSupplier: Organization: Newtonsoft
+PackageDownloadLocation: https://www.nuget.org/packages/Newtonsoft.Json/9.0.1
+FilesAnalyzed: false
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: Copyright (c) 2007 James Newton-King
+PackageSummary: Popular high-performance JSON framework for .NET
+
+Relationship: SPDXRef-Package-fo-dicom DEPENDS_ON SPDXRef-Package-Newtonsoft-Json
+
+##### Package: NLog
+
+PackageName: NLog
+SPDXID: SPDXRef-Package-NLog
+PackageVersion: 4.4.1
+PackageSupplier: Organization: NLog Project
+PackageDownloadLocation: https://www.nuget.org/packages/NLog/4.4.1
+FilesAnalyzed: false
+PackageLicenseConcluded: BSD-3-Clause
+PackageLicenseDeclared: BSD-3-Clause
+PackageCopyrightText: Copyright (c) 2004-2017 Jaroslaw Kowalski, Kim Christensen, Julian Verdurmen
+PackageSummary: Flexible .NET logging framework
+
+Relationship: SPDXRef-Package-fo-dicom DEPENDS_ON SPDXRef-Package-NLog
+
+##### Package: log4net
+
+PackageName: log4net
+SPDXID: SPDXRef-Package-log4net
+PackageVersion: 2.0.7
+PackageSupplier: Organization: Apache Software Foundation
+PackageDownloadLocation: https://www.nuget.org/packages/log4net/2.0.7
+FilesAnalyzed: false
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: Copyright 2004-2017 The Apache Software Foundation
+PackageSummary: The Apache log4net library is a tool to help the programmer output log statements
+
+Relationship: SPDXRef-Package-fo-dicom DEPENDS_ON SPDXRef-Package-log4net
+
+##### Package: Serilog
+
+PackageName: Serilog
+SPDXID: SPDXRef-Package-Serilog
+PackageVersion: 2.3.0
+PackageSupplier: Organization: Serilog Contributors
+PackageDownloadLocation: https://www.nuget.org/packages/Serilog/2.3.0
+FilesAnalyzed: false
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: Copyright 2013-2016 Serilog Contributors
+PackageSummary: Simple .NET logging with fully-structured events
+
+Relationship: SPDXRef-Package-fo-dicom DEPENDS_ON SPDXRef-Package-Serilog
+
+##### Package: MetroLog
+
+PackageName: MetroLog
+SPDXID: SPDXRef-Package-MetroLog
+PackageVersion: 1.0.1
+PackageSupplier: NOASSERTION
+PackageDownloadLocation: https://www.nuget.org/packages/MetroLog/1.0.1
+FilesAnalyzed: false
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+PackageSummary: Lightweight logging framework for portable class libraries
+
+Relationship: SPDXRef-Package-fo-dicom DEPENDS_ON SPDXRef-Package-MetroLog
+
+##### Package: xunit
+
+PackageName: xunit
+SPDXID: SPDXRef-Package-xunit
+PackageVersion: 2.1.0
+PackageSupplier: Organization: .NET Foundation
+PackageDownloadLocation: https://www.nuget.org/packages/xunit/2.1.0
+FilesAnalyzed: false
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: Copyright (c) .NET Foundation and Contributors
+PackageSummary: xUnit.net is a developer testing framework, built to support Test Driven Development
+
+Relationship: SPDXRef-Package-fo-dicom TEST_DEPENDENCY_OF SPDXRef-Package-xunit
+
+##### Package: xunit.abstractions
+
+PackageName: xunit.abstractions
+SPDXID: SPDXRef-Package-xunit-abstractions
+PackageVersion: 2.0.0
+PackageSupplier: Organization: .NET Foundation
+PackageDownloadLocation: https://www.nuget.org/packages/xunit.abstractions/2.0.0
+FilesAnalyzed: false
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: Copyright (c) .NET Foundation and Contributors
+PackageSummary: Abstractions library for xUnit.net
+
+Relationship: SPDXRef-Package-fo-dicom TEST_DEPENDENCY_OF SPDXRef-Package-xunit-abstractions
+
+##### Package: xunit.assert
+
+PackageName: xunit.assert
+SPDXID: SPDXRef-Package-xunit-assert
+PackageVersion: 2.1.0
+PackageSupplier: Organization: .NET Foundation
+PackageDownloadLocation: https://www.nuget.org/packages/xunit.assert/2.1.0
+FilesAnalyzed: false
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: Copyright (c) .NET Foundation and Contributors
+PackageSummary: Assertion library for xUnit.net
+
+Relationship: SPDXRef-Package-fo-dicom TEST_DEPENDENCY_OF SPDXRef-Package-xunit-assert
+
+##### Package: xunit.core
+
+PackageName: xunit.core
+SPDXID: SPDXRef-Package-xunit-core
+PackageVersion: 2.1.0
+PackageSupplier: Organization: .NET Foundation
+PackageDownloadLocation: https://www.nuget.org/packages/xunit.core/2.1.0
+FilesAnalyzed: false
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: Copyright (c) .NET Foundation and Contributors
+PackageSummary: Core library for xUnit.net
+
+Relationship: SPDXRef-Package-fo-dicom TEST_DEPENDENCY_OF SPDXRef-Package-xunit-core
+
+##### Package: xunit.extensibility.core
+
+PackageName: xunit.extensibility.core
+SPDXID: SPDXRef-Package-xunit-extensibility-core
+PackageVersion: 2.1.0
+PackageSupplier: Organization: .NET Foundation
+PackageDownloadLocation: https://www.nuget.org/packages/xunit.extensibility.core/2.1.0
+FilesAnalyzed: false
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: Copyright (c) .NET Foundation and Contributors
+PackageSummary: Extensibility core library for xUnit.net
+
+Relationship: SPDXRef-Package-fo-dicom TEST_DEPENDENCY_OF SPDXRef-Package-xunit-extensibility-core
+
+##### Package: xunit.extensibility.execution
+
+PackageName: xunit.extensibility.execution
+SPDXID: SPDXRef-Package-xunit-extensibility-execution
+PackageVersion: 2.1.0
+PackageSupplier: Organization: .NET Foundation
+PackageDownloadLocation: https://www.nuget.org/packages/xunit.extensibility.execution/2.1.0
+FilesAnalyzed: false
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: Copyright (c) .NET Foundation and Contributors
+PackageSummary: Extensibility execution library for xUnit.net
+
+Relationship: SPDXRef-Package-fo-dicom TEST_DEPENDENCY_OF SPDXRef-Package-xunit-extensibility-execution
+
+##### Package: xunit.runner.visualstudio
+
+PackageName: xunit.runner.visualstudio
+SPDXID: SPDXRef-Package-xunit-runner-visualstudio
+PackageVersion: 2.1.0
+PackageSupplier: Organization: .NET Foundation
+PackageDownloadLocation: https://www.nuget.org/packages/xunit.runner.visualstudio/2.1.0
+FilesAnalyzed: false
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: Copyright (c) .NET Foundation and Contributors
+PackageSummary: Visual Studio test runner for xUnit.net
+
+Relationship: SPDXRef-Package-fo-dicom TEST_DEPENDENCY_OF SPDXRef-Package-xunit-runner-visualstudio
+
+##### Package: NETStandard.Library
+
+PackageName: NETStandard.Library
+SPDXID: SPDXRef-Package-NETStandard-Library
+PackageVersion: 1.6.1
+PackageSupplier: Organization: Microsoft
+PackageDownloadLocation: https://www.nuget.org/packages/NETStandard.Library/1.6.1
+FilesAnalyzed: false
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: Copyright (c) .NET Foundation and Contributors
+PackageSummary: .NET Standard Library meta-package
+
+Relationship: SPDXRef-Package-fo-dicom DEPENDS_ON SPDXRef-Package-NETStandard-Library
+
+##### Package: System.Data.SqlClient
+
+PackageName: System.Data.SqlClient
+SPDXID: SPDXRef-Package-System-Data-SqlClient
+PackageVersion: 4.3.0
+PackageSupplier: Organization: Microsoft
+PackageDownloadLocation: https://www.nuget.org/packages/System.Data.SqlClient/4.3.0
+FilesAnalyzed: false
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: Copyright (c) .NET Foundation and Contributors
+PackageSummary: Provides the data provider for SQL Server
+
+Relationship: SPDXRef-Package-fo-dicom DEPENDS_ON SPDXRef-Package-System-Data-SqlClient
+
+##### Package: System.IO.FileSystem
+
+PackageName: System.IO.FileSystem
+SPDXID: SPDXRef-Package-System-IO-FileSystem
+PackageVersion: 4.3.0
+PackageSupplier: Organization: Microsoft
+PackageDownloadLocation: https://www.nuget.org/packages/System.IO.FileSystem/4.3.0
+FilesAnalyzed: false
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: Copyright (c) .NET Foundation and Contributors
+PackageSummary: Provides types that allow reading and writing to files
+
+Relationship: SPDXRef-Package-fo-dicom DEPENDS_ON SPDXRef-Package-System-IO-FileSystem
+
+##### Package: System.Net.NetworkInformation
+
+PackageName: System.Net.NetworkInformation
+SPDXID: SPDXRef-Package-System-Net-NetworkInformation
+PackageVersion: 4.3.0
+PackageSupplier: Organization: Microsoft
+PackageDownloadLocation: https://www.nuget.org/packages/System.Net.NetworkInformation/4.3.0
+FilesAnalyzed: false
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: Copyright (c) .NET Foundation and Contributors
+PackageSummary: Provides access to network traffic data and address information
+
+Relationship: SPDXRef-Package-fo-dicom DEPENDS_ON SPDXRef-Package-System-Net-NetworkInformation
+
+##### Package: System.Net.Security
+
+PackageName: System.Net.Security
+SPDXID: SPDXRef-Package-System-Net-Security
+PackageVersion: 4.3.0
+PackageSupplier: Organization: Microsoft
+PackageDownloadLocation: https://www.nuget.org/packages/System.Net.Security/4.3.0
+FilesAnalyzed: false
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: Copyright (c) .NET Foundation and Contributors
+PackageSummary: Provides types for network security
+
+Relationship: SPDXRef-Package-fo-dicom DEPENDS_ON SPDXRef-Package-System-Net-Security
+
+##### Package: System.Runtime.Serialization.Primitives
+
+PackageName: System.Runtime.Serialization.Primitives
+SPDXID: SPDXRef-Package-System-Runtime-Serialization-Primitives
+PackageVersion: 4.3.0
+PackageSupplier: Organization: Microsoft
+PackageDownloadLocation: https://www.nuget.org/packages/System.Runtime.Serialization.Primitives/4.3.0
+FilesAnalyzed: false
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: Copyright (c) .NET Foundation and Contributors
+PackageSummary: Provides common types for runtime serialization libraries
+
+Relationship: SPDXRef-Package-fo-dicom DEPENDS_ON SPDXRef-Package-System-Runtime-Serialization-Primitives
+
+##### Package: System.Runtime.Numerics
+
+PackageName: System.Runtime.Numerics
+SPDXID: SPDXRef-Package-System-Runtime-Numerics
+PackageVersion: 4.3.0
+PackageSupplier: Organization: Microsoft
+PackageDownloadLocation: https://www.nuget.org/packages/System.Runtime.Numerics/4.3.0
+FilesAnalyzed: false
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: Copyright (c) .NET Foundation and Contributors
+PackageSummary: Provides numeric types that complement the numeric primitives
+
+Relationship: SPDXRef-Package-fo-dicom DEPENDS_ON SPDXRef-Package-System-Runtime-Numerics
+
+##### Package: System.Threading.Tasks.Parallel
+
+PackageName: System.Threading.Tasks.Parallel
+SPDXID: SPDXRef-Package-System-Threading-Tasks-Parallel
+PackageVersion: 4.3.0
+PackageSupplier: Organization: Microsoft
+PackageDownloadLocation: https://www.nuget.org/packages/System.Threading.Tasks.Parallel/4.3.0
+FilesAnalyzed: false
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: Copyright (c) .NET Foundation and Contributors
+PackageSummary: Provides library-based data parallel replacements for common operations
+
+Relationship: SPDXRef-Package-fo-dicom DEPENDS_ON SPDXRef-Package-System-Threading-Tasks-Parallel
+
+##### Package: Microsoft.NETCore.UniversalWindowsPlatform
+
+PackageName: Microsoft.NETCore.UniversalWindowsPlatform
+SPDXID: SPDXRef-Package-Microsoft-NETCore-UniversalWindowsPlatform
+PackageVersion: 5.2.2
+PackageSupplier: Organization: Microsoft
+PackageDownloadLocation: https://www.nuget.org/packages/Microsoft.NETCore.UniversalWindowsPlatform/5.2.2
+FilesAnalyzed: false
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: Copyright (c) .NET Foundation and Contributors
+PackageSummary: Provides a set of packages that can be used when building Universal Windows applications
+
+Relationship: SPDXRef-Package-fo-dicom OPTIONAL_DEPENDENCY_OF SPDXRef-Package-Microsoft-NETCore-UniversalWindowsPlatform
+
+##### Embedded Native Libraries
+
+##### Package: libijg-8bit
+
+PackageName: libijg-8bit
+SPDXID: SPDXRef-Package-libijg-8bit
+PackageVersion: embedded
+PackageSupplier: Organization: Independent JPEG Group
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: false
+PackageLicenseConcluded: IJG
+PackageLicenseDeclared: IJG
+PackageCopyrightText: Copyright (C) 1991-1998, Thomas G. Lane
+PackageSummary: Independent JPEG Group library - 8-bit JPEG codec (embedded source)
+ExternalRef: SECURITY cpe23Type cpe:2.3:a:ijg:libjpeg:*:*:*:*:*:*:*:*
+
+Relationship: SPDXRef-Package-fo-dicom CONTAINS SPDXRef-Package-libijg-8bit
+
+##### Package: libijg-12bit
+
+PackageName: libijg-12bit
+SPDXID: SPDXRef-Package-libijg-12bit
+PackageVersion: embedded
+PackageSupplier: Organization: Independent JPEG Group
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: false
+PackageLicenseConcluded: IJG
+PackageLicenseDeclared: IJG
+PackageCopyrightText: Copyright (C) 1991-1998, Thomas G. Lane
+PackageSummary: Independent JPEG Group library - 12-bit JPEG codec (embedded source)
+ExternalRef: SECURITY cpe23Type cpe:2.3:a:ijg:libjpeg:*:*:*:*:*:*:*:*
+
+Relationship: SPDXRef-Package-fo-dicom CONTAINS SPDXRef-Package-libijg-12bit
+
+##### Package: libijg-16bit
+
+PackageName: libijg-16bit
+SPDXID: SPDXRef-Package-libijg-16bit
+PackageVersion: embedded
+PackageSupplier: Organization: Independent JPEG Group
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: false
+PackageLicenseConcluded: IJG
+PackageLicenseDeclared: IJG
+PackageCopyrightText: Copyright (C) 1991-1998, Thomas G. Lane
+PackageSummary: Independent JPEG Group library - 16-bit JPEG codec (embedded source)
+ExternalRef: SECURITY cpe23Type cpe:2.3:a:ijg:libjpeg:*:*:*:*:*:*:*:*
+
+Relationship: SPDXRef-Package-fo-dicom CONTAINS SPDXRef-Package-libijg-16bit
+
+##### Package: OpenJPEG
+
+PackageName: OpenJPEG
+SPDXID: SPDXRef-Package-OpenJPEG
+PackageVersion: embedded
+PackageSupplier: Organization: Universite catholique de Louvain (UCL), Belgium
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: false
+PackageLicenseConcluded: BSD-2-Clause
+PackageLicenseDeclared: BSD-2-Clause
+PackageCopyrightText: <text>Copyright (c) 2002-2007, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium
+Copyright (c) 2002-2007, Professor Benoit Macq
+Copyright (c) 2001-2003, David Janssens
+Copyright (c) 2002-2003, Yannick Verschueren
+Copyright (c) 2003-2007, Francois-Olivier Devaux and Antonin Descampe
+Copyright (c) 2005, Herve Drolon, FreeImage Team</text>
+PackageSummary: JPEG 2000 codec library (embedded source)
+ExternalRef: SECURITY cpe23Type cpe:2.3:a:uclouvain:openjpeg:*:*:*:*:*:*:*:*
+
+Relationship: SPDXRef-Package-fo-dicom CONTAINS SPDXRef-Package-OpenJPEG
+
+##### Package: CharLS
+
+PackageName: CharLS
+SPDXID: SPDXRef-Package-CharLS
+PackageVersion: embedded
+PackageSupplier: Person: Jan de Vaan
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: false
+PackageLicenseConcluded: BSD-3-Clause
+PackageLicenseDeclared: BSD-3-Clause
+PackageCopyrightText: Copyright (c) 2007-2009, Jan de Vaan
+PackageSummary: JPEG-LS codec library (embedded source)
+ExternalRef: SECURITY cpe23Type cpe:2.3:a:charls:charls:*:*:*:*:*:*:*:*
+
+Relationship: SPDXRef-Package-fo-dicom CONTAINS SPDXRef-Package-CharLS
+
+##### License Information
+
+LicenseID: LicenseRef-MS-PL
+ExtractedText: <text>Microsoft Public License (MS-PL)
+
+This license governs use of the accompanying software. If you use the software, you
+accept this license. If you do not accept the license, do not use the software.
+
+1. Definitions
+The terms "reproduce," "reproduction," "derivative works," and "distribution" have the
+same meaning here as under U.S. copyright law.
+A "contribution" is the original software, or any additions or changes to the software.
+A "contributor" is any person that distributes its contribution under this license.
+"Licensed patents" are a contributor's patent claims that read directly on its contribution.
+
+2. Grant of Rights
+(A) Copyright Grant- Subject to the terms of this license, including the license conditions 
+    and limitations in section 3, each contributor grants you a non-exclusive, worldwide, 
+	royalty-free copyright license to reproduce its contribution, prepare derivative works 
+	of its contribution, and distribute its contribution or any derivative works that you create.
+(B) Patent Grant- Subject to the terms of this license, including the license conditions and 
+    limitations in section 3, each contributor grants you a non-exclusive, worldwide, royalty-free 
+	license under its licensed patents to make, have made, use, sell, offer for sale, import, 
+	and/or otherwise dispose of its contribution in the software or derivative works of the 
+	contribution in the software.
+
+3. Conditions and Limitations
+(A) No Trademark License- This license does not grant you rights to use any contributors' name, 
+    logo, or trademarks.
+(B) If you bring a patent claim against any contributor over patents that you claim are infringed 
+    by the software, your patent license from such contributor to the software ends automatically.
+(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, 
+    and attribution notices that are present in the software.
+(D) If you distribute any portion of the software in source code form, you may do so only under this 
+    license by including a complete copy of this license with your distribution. If you distribute 
+	any portion of the software in compiled or object code form, you may only do so under a license 
+	that complies with this license.
+(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express 
+    warranties, guarantees or conditions. You may have additional consumer rights under your local 
+	laws which this license cannot change. To the extent permitted under your local laws, the 
+	contributors exclude the implied warranties of merchantability, fitness for a particular purpose 
+	and non-infringement.</text>
+LicenseName: Microsoft Public License
+
+LicenseID: LicenseRef-IJG
+ExtractedText: <text>The authors make NO WARRANTY or representation, either express or implied,
+with respect to this software, its quality, accuracy, merchantability, or
+fitness for a particular purpose.  This software is provided "AS IS", and you,
+its user, assume the entire risk as to its quality and accuracy.
+
+This software is copyright (C) 1991-1998, Thomas G. Lane.
+All Rights Reserved except as specified below.
+
+Permission is hereby granted to use, copy, modify, and distribute this
+software (or portions thereof) for any purpose, without fee, subject to these
+conditions:
+(1) If any part of the source code for this software is distributed, then this
+README file must be included, with this copyright and no-warranty notice
+unaltered; and any additions, deletions, or changes to the original files
+must be clearly indicated in accompanying documentation.
+(2) If only executable code is distributed, then the accompanying
+documentation must state that "this software is based in part on the work of
+the Independent JPEG Group".
+(3) Permission for use of this software is granted only if the user accepts
+full responsibility for any undesirable consequences; the authors accept
+NO LIABILITY for damages of any kind.
+
+These conditions apply to any software derived from or based on the IJG code,
+not just to the unmodified library.  If you use our work, you ought to
+acknowledge us.
+
+Permission is NOT granted for the use of any IJG author's name or company name
+in advertising or publicity relating to this software or products derived from
+it.  This software may be referred to only as "the Independent JPEG Group's
+software".
+
+We specifically permit and encourage the use of this software as the basis of
+commercial products, provided that all warranty or liability claims are
+assumed by the product vendor.</text>
+LicenseName: Independent JPEG Group License
