@@ -160,3 +160,9 @@ that were previously included in the *Examples* sub-folder of the VS solutions.
 This library is licensed under the [Microsoft Public License (MS-PL)](http://opensource.org/licenses/MS-PL). See [License.txt](License.txt) for more information.
 
 For a comprehensive list of all dependencies and their licenses, see [DEPENDENCIES.md](DEPENDENCIES.md).
+
+### Software Bill of Materials (SBOM)
+Software Bill of Materials are available in multiple standard formats:
+- [SBOM.md](SBOM.md) - Human-readable Markdown format
+- [SBOM.spdx](SBOM.spdx) - SPDX 2.3 format (ISO/IEC 5962:2021 standard)
+- [SBOM.json](SBOM.json) - CycloneDX 1.4 format (JSON)

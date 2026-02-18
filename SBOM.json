@@ -1,0 +1,528 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-02-18T00:00:00Z",
+    "tools": [
+      {
+        "vendor": "Vet Rocket LLC",
+        "name": "manual",
+        "version": "1.0"
+      }
+    ],
+    "component": {
+      "type": "library",
+      "bom-ref": "pkg:nuget/fo-dicom@3.0.0.30",
+      "name": "fo-dicom",
+      "version": "3.0.0.30",
+      "description": "Fellow Oak DICOM for .NET, .NET Core, Universal Windows, Android, iOS, Mono and Unity",
+      "licenses": [
+        {
+          "license": {
+            "id": "MS-PL"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/fo-dicom@3.0.0.30",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/fo-dicom/fo-dicom"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/Vet-Rocket/fo-dicom"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/CSJ2K@2.0.0.1",
+      "name": "CSJ2K",
+      "version": "2.0.0.1",
+      "description": "C# port of OpenJPEG JPEG 2000 library",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-2-Clause"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/CSJ2K@2.0.0.1"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/Portable.LibJpeg.NET@1.5.1.1",
+      "name": "Portable.LibJpeg.NET",
+      "version": "1.5.1.1",
+      "description": "Managed JPEG codec implementation",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/Portable.LibJpeg.NET@1.5.1.1"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/Newtonsoft.Json@9.0.1",
+      "name": "Newtonsoft.Json",
+      "version": "9.0.1",
+      "description": "Popular high-performance JSON framework for .NET",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/Newtonsoft.Json@9.0.1"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/NLog@4.4.1",
+      "name": "NLog",
+      "version": "4.4.1",
+      "description": "Flexible .NET logging framework",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/NLog@4.4.1"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/log4net@2.0.7",
+      "name": "log4net",
+      "version": "2.0.7",
+      "description": "The Apache log4net library is a tool to help the programmer output log statements",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/log4net@2.0.7"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/Serilog@2.3.0",
+      "name": "Serilog",
+      "version": "2.3.0",
+      "description": "Simple .NET logging with fully-structured events",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/Serilog@2.3.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/MetroLog@1.0.1",
+      "name": "MetroLog",
+      "version": "1.0.1",
+      "description": "Lightweight logging framework for portable class libraries",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/MetroLog@1.0.1"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/xunit@2.1.0",
+      "name": "xunit",
+      "version": "2.1.0",
+      "scope": "optional",
+      "description": "xUnit.net is a developer testing framework, built to support Test Driven Development",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/xunit@2.1.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/xunit.abstractions@2.0.0",
+      "name": "xunit.abstractions",
+      "version": "2.0.0",
+      "scope": "optional",
+      "description": "Abstractions library for xUnit.net",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/xunit.abstractions@2.0.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/xunit.assert@2.1.0",
+      "name": "xunit.assert",
+      "version": "2.1.0",
+      "scope": "optional",
+      "description": "Assertion library for xUnit.net",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/xunit.assert@2.1.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/xunit.core@2.1.0",
+      "name": "xunit.core",
+      "version": "2.1.0",
+      "scope": "optional",
+      "description": "Core library for xUnit.net",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/xunit.core@2.1.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/xunit.extensibility.core@2.1.0",
+      "name": "xunit.extensibility.core",
+      "version": "2.1.0",
+      "scope": "optional",
+      "description": "Extensibility core library for xUnit.net",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/xunit.extensibility.core@2.1.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/xunit.extensibility.execution@2.1.0",
+      "name": "xunit.extensibility.execution",
+      "version": "2.1.0",
+      "scope": "optional",
+      "description": "Extensibility execution library for xUnit.net",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/xunit.extensibility.execution@2.1.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/xunit.runner.visualstudio@2.1.0",
+      "name": "xunit.runner.visualstudio",
+      "version": "2.1.0",
+      "scope": "optional",
+      "description": "Visual Studio test runner for xUnit.net",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/xunit.runner.visualstudio@2.1.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/NETStandard.Library@1.6.1",
+      "name": "NETStandard.Library",
+      "version": "1.6.1",
+      "description": ".NET Standard Library meta-package",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/NETStandard.Library@1.6.1"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Data.SqlClient@4.3.0",
+      "name": "System.Data.SqlClient",
+      "version": "4.3.0",
+      "description": "Provides the data provider for SQL Server",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/System.Data.SqlClient@4.3.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.IO.FileSystem@4.3.0",
+      "name": "System.IO.FileSystem",
+      "version": "4.3.0",
+      "description": "Provides types that allow reading and writing to files",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/System.IO.FileSystem@4.3.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Net.NetworkInformation@4.3.0",
+      "name": "System.Net.NetworkInformation",
+      "version": "4.3.0",
+      "description": "Provides access to network traffic data and address information",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/System.Net.NetworkInformation@4.3.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Net.Security@4.3.0",
+      "name": "System.Net.Security",
+      "version": "4.3.0",
+      "description": "Provides types for network security",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/System.Net.Security@4.3.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Runtime.Serialization.Primitives@4.3.0",
+      "name": "System.Runtime.Serialization.Primitives",
+      "version": "4.3.0",
+      "description": "Provides common types for runtime serialization libraries",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/System.Runtime.Serialization.Primitives@4.3.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Runtime.Numerics@4.3.0",
+      "name": "System.Runtime.Numerics",
+      "version": "4.3.0",
+      "description": "Provides numeric types that complement the numeric primitives",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/System.Runtime.Numerics@4.3.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/System.Threading.Tasks.Parallel@4.3.0",
+      "name": "System.Threading.Tasks.Parallel",
+      "version": "4.3.0",
+      "description": "Provides library-based data parallel replacements for common operations",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/System.Threading.Tasks.Parallel@4.3.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:nuget/Microsoft.NETCore.UniversalWindowsPlatform@5.2.2",
+      "name": "Microsoft.NETCore.UniversalWindowsPlatform",
+      "version": "5.2.2",
+      "scope": "optional",
+      "description": "Provides a set of packages that can be used when building Universal Windows applications",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:nuget/Microsoft.NETCore.UniversalWindowsPlatform@5.2.2"
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:generic/libijg-8bit@embedded",
+      "name": "libijg-8bit",
+      "version": "embedded",
+      "description": "Independent JPEG Group library - 8-bit JPEG codec (embedded source)",
+      "licenses": [
+        {
+          "license": {
+            "name": "IJG License"
+          }
+        }
+      ],
+      "purl": "pkg:generic/libijg-8bit@embedded",
+      "externalReferences": [
+        {
+          "type": "other",
+          "comment": "Embedded as source code in DICOM.Native/libijg8"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:generic/libijg-12bit@embedded",
+      "name": "libijg-12bit",
+      "version": "embedded",
+      "description": "Independent JPEG Group library - 12-bit JPEG codec (embedded source)",
+      "licenses": [
+        {
+          "license": {
+            "name": "IJG License"
+          }
+        }
+      ],
+      "purl": "pkg:generic/libijg-12bit@embedded",
+      "externalReferences": [
+        {
+          "type": "other",
+          "comment": "Embedded as source code in DICOM.Native/libijg12"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:generic/libijg-16bit@embedded",
+      "name": "libijg-16bit",
+      "version": "embedded",
+      "description": "Independent JPEG Group library - 16-bit JPEG codec (embedded source)",
+      "licenses": [
+        {
+          "license": {
+            "name": "IJG License"
+          }
+        }
+      ],
+      "purl": "pkg:generic/libijg-16bit@embedded",
+      "externalReferences": [
+        {
+          "type": "other",
+          "comment": "Embedded as source code in DICOM.Native/libijg16"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:generic/openjpeg@embedded",
+      "name": "OpenJPEG",
+      "version": "embedded",
+      "description": "JPEG 2000 codec library (embedded source)",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-2-Clause"
+          }
+        }
+      ],
+      "purl": "pkg:generic/openjpeg@embedded",
+      "externalReferences": [
+        {
+          "type": "other",
+          "comment": "Embedded as source code in DICOM.Native/OpenJPEG"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:generic/charls@embedded",
+      "name": "CharLS",
+      "version": "embedded",
+      "description": "JPEG-LS codec library (embedded source)",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "purl": "pkg:generic/charls@embedded",
+      "externalReferences": [
+        {
+          "type": "other",
+          "comment": "Embedded as source code in DICOM.Native/CharLS"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:nuget/fo-dicom@3.0.0.30",
+      "dependsOn": [
+        "pkg:nuget/CSJ2K@2.0.0.1",
+        "pkg:nuget/Portable.LibJpeg.NET@1.5.1.1",
+        "pkg:nuget/Newtonsoft.Json@9.0.1",
+        "pkg:nuget/NLog@4.4.1",
+        "pkg:nuget/log4net@2.0.7",
+        "pkg:nuget/Serilog@2.3.0",
+        "pkg:nuget/MetroLog@1.0.1",
+        "pkg:nuget/NETStandard.Library@1.6.1",
+        "pkg:nuget/System.Data.SqlClient@4.3.0",
+        "pkg:nuget/System.IO.FileSystem@4.3.0",
+        "pkg:nuget/System.Net.NetworkInformation@4.3.0",
+        "pkg:nuget/System.Net.Security@4.3.0",
+        "pkg:nuget/System.Runtime.Serialization.Primitives@4.3.0",
+        "pkg:nuget/System.Runtime.Numerics@4.3.0",
+        "pkg:nuget/System.Threading.Tasks.Parallel@4.3.0",
+        "pkg:generic/libijg-8bit@embedded",
+        "pkg:generic/libijg-12bit@embedded",
+        "pkg:generic/libijg-16bit@embedded",
+        "pkg:generic/openjpeg@embedded",
+        "pkg:generic/charls@embedded"
+      ]
+    }
+  ]
+}
