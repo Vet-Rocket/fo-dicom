@@ -110,13 +110,25 @@ namespace Dicom.Imaging.Codec
                 throw;
             }
 
-            var container = new CompositionContainer(catalog);
-            foreach (var lazy in container.GetExports<IDicomCodec>())
+            try
             {
-                foundAnyCodecs = true;
-                var codec = lazy.Value;
-                log.Debug("Codec: {codecName}", codec.TransferSyntax.UID.Name);
-                Codecs[codec.TransferSyntax] = codec;
+                var container = new CompositionContainer(catalog);
+                foreach (var lazy in container.GetExports<IDicomCodec>())
+                {
+                    foundAnyCodecs = true;
+                    var codec = lazy.Value;
+                    log.Debug("Codec: {codecName}", codec.TransferSyntax.UID.Name);
+                    Codecs[codec.TransferSyntax] = codec;
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(
+                    "Error encountered loading codecs from DirectoryCatalog({path}, {search}) - {@exception}",
+                    path,
+                    search,
+                    ex);
+                throw;
             }
 #endif
 

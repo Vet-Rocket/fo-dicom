@@ -23,177 +23,177 @@ namespace Dicom
     /// <summary>
     /// Updates a DICOM dataset based on a database query.
     /// </summary>
-    public class DatabaseQueryTransformRule : IDicomTransformRule
-    {
-        #region Private Members
+//    public class DatabaseQueryTransformRule : IDicomTransformRule
+//    {
+//        #region Private Members
 
-        private string _connectionString;
+//        private string _connectionString;
 
-        private DatabaseType _dbType;
+//        private DatabaseType _dbType;
 
-        private string _query;
+//        private string _query;
 
-        private List<DicomTag> _output;
+//        private List<DicomTag> _output;
 
-        private List<DicomTag> _params;
+//        private List<DicomTag> _params;
 
-        #endregion
+//        #endregion
 
-        #region Public Constructor
+//        #region Public Constructor
 
-        public DatabaseQueryTransformRule()
-        {
-            _dbType = DatabaseType.MsSql;
-            _output = new List<DicomTag>();
-            _params = new List<DicomTag>();
-        }
+//        public DatabaseQueryTransformRule()
+//        {
+//            _dbType = DatabaseType.MsSql;
+//            _output = new List<DicomTag>();
+//            _params = new List<DicomTag>();
+//        }
 
-        public DatabaseQueryTransformRule(
-            string connectionString,
-            DatabaseType dbType,
-            string query,
-            DicomTag[] outputTags,
-            DicomTag[] paramTags)
-        {
-            _connectionString = connectionString;
-            _dbType = dbType;
-            _query = query;
-            _output = new List<DicomTag>(outputTags);
-            _params = new List<DicomTag>(paramTags);
-        }
+//        public DatabaseQueryTransformRule(
+//            string connectionString,
+//            DatabaseType dbType,
+//            string query,
+//            DicomTag[] outputTags,
+//            DicomTag[] paramTags)
+//        {
+//            _connectionString = connectionString;
+//            _dbType = dbType;
+//            _query = query;
+//            _output = new List<DicomTag>(outputTags);
+//            _params = new List<DicomTag>(paramTags);
+//        }
 
-        #endregion
+//        #endregion
 
-        #region Public Properties
+//        #region Public Properties
 
-        public string ConnectionString
-        {
-            get
-            {
-                return _connectionString;
-            }
-            set
-            {
-                _connectionString = value;
-            }
-        }
+//        public string ConnectionString
+//        {
+//            get
+//            {
+//                return _connectionString;
+//            }
+//            set
+//            {
+//                _connectionString = value;
+//            }
+//        }
 
-        public DatabaseType ConnectionType
-        {
-            get
-            {
-                return _dbType;
-            }
-            set
-            {
-                _dbType = value;
-            }
-        }
+//        public DatabaseType ConnectionType
+//        {
+//            get
+//            {
+//                return _dbType;
+//            }
+//            set
+//            {
+//                _dbType = value;
+//            }
+//        }
 
-        public string Query
-        {
-            get
-            {
-                return _query;
-            }
-            set
-            {
-                _query = value;
-            }
-        }
+//        public string Query
+//        {
+//            get
+//            {
+//                return _query;
+//            }
+//            set
+//            {
+//                _query = value;
+//            }
+//        }
 
-        public List<DicomTag> Output
-        {
-            get
-            {
-                return _output;
-            }
-            set
-            {
-                _output = value;
-            }
-        }
+//        public List<DicomTag> Output
+//        {
+//            get
+//            {
+//                return _output;
+//            }
+//            set
+//            {
+//                _output = value;
+//            }
+//        }
 
-        public List<DicomTag> Parameters
-        {
-            get
-            {
-                return _params;
-            }
-            set
-            {
-                _params = value;
-            }
-        }
+//        public List<DicomTag> Parameters
+//        {
+//            get
+//            {
+//                return _params;
+//            }
+//            set
+//            {
+//                _params = value;
+//            }
+//        }
 
-        #endregion
+//        #endregion
 
-        #region Public Methods
+//        #region Public Methods
 
-        public void Transform(DicomDataset dataset, DicomDataset modifiedAttributesSequenceItem = null)
-        {
-            IDbConnection connection = null;
+//        public void Transform(DicomDataset dataset, DicomDataset modifiedAttributesSequenceItem = null)
+//        {
+//            IDbConnection connection = null;
 
-            try
-            {
-                if (_dbType == DatabaseType.MsSql) connection = new SqlConnection(_connectionString);
-#if !__IOS__ && !__ANDROID__ && !NETSTANDARD
-                else if (_dbType == DatabaseType.Odbc) connection = new OdbcConnection(_connectionString);
-#endif
-                using (IDbCommand command = connection.CreateCommand())
-                {
-                    command.Connection = connection;
-                    command.CommandText = _query;
+//            try
+//            {
+//                if (_dbType == DatabaseType.MsSql) connection = new SqlConnection(_connectionString);
+//#if !__IOS__ && !__ANDROID__ && !NETSTANDARD
+//                else if (_dbType == DatabaseType.Odbc) connection = new OdbcConnection(_connectionString);
+//#endif
+//                using (IDbCommand command = connection.CreateCommand())
+//                {
+//                    command.Connection = connection;
+//                    command.CommandText = _query;
 
-                    for (int i = 0; i < _params.Count; i++)
-                    {
-                        var str = dataset.Get<string>(_params[i], -1, String.Empty);
-                        SqlParameter prm = new SqlParameter(String.Format("@{0}", i), str);
-                        command.Parameters.Add(prm);
-                    }
+//                    for (int i = 0; i < _params.Count; i++)
+//                    {
+//                        var str = dataset.Get<string>(_params[i], -1, String.Empty);
+//                        SqlParameter prm = new SqlParameter(String.Format("@{0}", i), str);
+//                        command.Parameters.Add(prm);
+//                    }
 
-                    connection.Open();
+//                    connection.Open();
 
-                    if (_output.Count == 0)
-                    {
-                        command.ExecuteNonQuery();
-                    }
-                    else
-                    {
-                        using (IDataReader reader = command.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                for (int i = 0; i < _output.Count; i++)
-                                {
-                                    dataset.CopyTo(modifiedAttributesSequenceItem, _output[i]);
-                                    string str = reader.GetString(i);
-                                    dataset.AddOrUpdate(_output[i], str);
-                                }
-                            }
-                        }
-                    }
+//                    if (_output.Count == 0)
+//                    {
+//                        command.ExecuteNonQuery();
+//                    }
+//                    else
+//                    {
+//                        using (IDataReader reader = command.ExecuteReader())
+//                        {
+//                            if (reader.Read())
+//                            {
+//                                for (int i = 0; i < _output.Count; i++)
+//                                {
+//                                    dataset.CopyTo(modifiedAttributesSequenceItem, _output[i]);
+//                                    string str = reader.GetString(i);
+//                                    dataset.AddOrUpdate(_output[i], str);
+//                                }
+//                            }
+//                        }
+//                    }
 
-                    connection.Close();
+//                    connection.Close();
 
-                    connection = null;
-                }
-            }
-            finally
-            {
-                if (connection != null)
-                {
-                    if (connection.State == ConnectionState.Closed || connection.State == ConnectionState.Broken) connection.Close();
-                    connection.Dispose();
-                }
-            }
-        }
+//                    connection = null;
+//                }
+//            }
+//            finally
+//            {
+//                if (connection != null)
+//                {
+//                    if (connection.State == ConnectionState.Closed || connection.State == ConnectionState.Broken) connection.Close();
+//                    connection.Dispose();
+//                }
+//            }
+//        }
 
-        public override string ToString()
-        {
-            return base.ToString();
-        }
+//        public override string ToString()
+//        {
+//            return base.ToString();
+//        }
 
-        #endregion
-    }
+//        #endregion
+//    }
 }
