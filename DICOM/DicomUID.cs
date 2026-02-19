@@ -53,6 +53,7 @@ namespace Dicom
 
         public DicomUID(string uid, string name, DicomUidType type, bool retired = false)
         {
+            ValidatePathSafety(uid);
             _uid = uid;
             _name = name;
             _type = type;
@@ -103,7 +104,7 @@ namespace Dicom
                 RootUID = "1.2.826.0.1.3680043.2.1343.1";
             }
 
-            var uid = $"{RootUID}.{DateTime.UtcNow}.{DateTime.UtcNow.Ticks}";
+            var uid = $"{RootUID}.{DateTime.UtcNow.Ticks}";//weak
 
             return new DicomUID(uid, name, DicomUidType.SOPInstance);
         }
@@ -121,17 +122,85 @@ namespace Dicom
             return new DicomUID(uid.ToString(), "SOP Instance UID", DicomUidType.SOPInstance);
         }
 
+        /// <summary>
+        /// Validates that a UID string is safe to use as a path component.
+        /// This validation is always performed regardless of DicomValidation settings.
+        /// </summary>
+        /// <param name="uid">The UID string to validate.</param>
+        /// <exception cref="DicomDataException">Thrown when the UID contains unsafe characters or patterns.</exception>
+        private static void ValidatePathSafety(string uid)
+        {
+            if (string.IsNullOrEmpty(uid))
+            {
+                // Allow empty/null for internal use (will be caught by DICOM validation if needed)
+                return;
+            }
+
+            string trimmedUid = uid.TrimEnd(' ', '\0');
+
+            // First, ensure only valid UID characters (digits and dots)
+            foreach (char c in trimmedUid)
+            {
+                if (c != '.' && !Char.IsDigit(c))
+                {
+                    throw new DicomDataException(
+                        $"Invalid UID '{uid}': contains invalid character '{c}'. UIDs must contain only digits (0-9) and dots (.)");
+                }
+            }
+
+            // Prevent path traversal with consecutive dots
+            if (trimmedUid.Contains(".."))
+            {
+                throw new DicomDataException(
+                    $"Invalid UID '{uid}': contains consecutive dots '..' which could create unsafe path traversal when used in file paths");
+            }
+
+            // Prevent leading dot (creates hidden files/folders on Unix)
+            if (trimmedUid.StartsWith("."))
+            {
+                throw new DicomDataException(
+                    $"Invalid UID '{uid}': starts with '.' which could create hidden directories or invalid paths when used in file paths");
+            }
+
+            // Prevent trailing dot (invalid on Windows)
+            if (trimmedUid.EndsWith("."))
+            {
+                throw new DicomDataException(
+                    $"Invalid UID '{uid}': ends with '.' which creates invalid paths on Windows filesystems");
+            }
+
+            // Enforce reasonable length limit (filesystem path component limit)
+            if (trimmedUid.Length > 255)
+            {
+                throw new DicomDataException(
+                    $"Invalid UID '{uid}': exceeds maximum path component length of 255 characters");
+            }
+
+            // Check for empty components (consecutive dots already caught above, but this catches edge cases)
+            var components = trimmedUid.Split('.');
+            foreach (var component in components)
+            {
+                if (string.IsNullOrEmpty(component))
+                {
+                    throw new DicomDataException(
+                        $"Invalid UID '{uid}': contains empty component (dots without digits between them)");
+                }
+            }
+        }
+
         public static bool IsValid(string uid)
         {
             if (String.IsNullOrEmpty(uid)) return false;
 
-            // only checks that the UID contains valid characters
-            foreach (char c in uid)
+            try
             {
-                if (c != '.' && !Char.IsDigit(c)) return false;
+                ValidatePathSafety(uid);
+                return true;
             }
-
-            return true;
+            catch (DicomDataException)
+            {
+                return false;
+            }
         }
 
         public static DicomUID Parse(string s)
@@ -143,6 +212,8 @@ namespace Dicom
 
             //if (!IsValid(u))
             //	throw new DicomDataException("Invalid characters in UID string ['" + u + "']");
+
+            ValidatePathSafety(u);
 
             return new DicomUID(u, "Unknown", DicomUidType.Unknown);
         }
