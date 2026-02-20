@@ -25,6 +25,8 @@ namespace Dicom.Network
     {
         public enum DicomAssociationState { None = 0, Requested = 1, Accepted = 2, Rejected = 3, ReleaseRequested = 4, Released = 5, Aborted = 6 }
 
+
+
         #region FIELDS
 
         private volatile bool _disposed = false;
@@ -649,10 +651,24 @@ namespace Dicom.Network
                         {
                             throw new DicomDataException("Invalid PDU length: " + length.ToString());
                         }
+                        // MaxPduPayloadLength is payload bytes (excludes 6-byte PDU header)
+                        if (length > DicomAssociation.MaxPduPayloadLength)
+                        {
+                            throw new DicomDataException("PDU length " + length + " exceeds maximum allowed length of " + DicomAssociation.MaxPduPayloadLength);
+                        }
+                        int bufSize;
+                        try
+                        {
+                            bufSize = checked(length + 6);
+                        }
+                        catch (OverflowException ex)
+                        {
+                            throw new DicomDataException("Invalid PDU length: " + length, ex);
+                        }
 
                         _readLength = length;
 
-                        Array.Resize(ref buffer, length + 6);
+                        Array.Resize(ref buffer, bufSize);
                         count = await ReadStreamAsync(stream, buffer, 6, length).ConfigureAwait(false);
 
                         // Read PDU

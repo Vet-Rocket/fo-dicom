@@ -16,6 +16,10 @@ namespace Dicom.Network
 
         private readonly ushort _AssociationId;
 
+        // Absolute hard cap to prevent memory/CPU DoS (payload bytes, excludes 6-byte PDU header).
+        // 16 MiB is intentionally generous to avoid rejecting valid traffic while still bounding allocations.
+        public const uint MaxPduPayloadLength = 16 * 1024 * 1024;
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DicomAssociation"/> class. 

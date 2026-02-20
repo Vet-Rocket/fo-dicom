@@ -10,7 +10,6 @@ using System.Text;
 
 namespace Dicom.Network
 {
-
     #region Raw PDU
 
     /// <summary>Encapsulates PDU data for reading or writing</summary>
@@ -542,7 +541,7 @@ namespace Dicom.Network
             pdu.Write("Item-Type", (byte)0x51);
             pdu.Write("Reserved", (byte)0x00);
             pdu.Write("Item-Length", (ushort)0x0004);
-            pdu.Write("Max PDU Length", (uint)_assoc.MaximumPDULength);
+            pdu.Write("Max PDU Length", Math.Min(DicomAssociation.MaxPduPayloadLength,_assoc.MaximumPDULength));
 
             // Implementation Class UID
             pdu.Write("Item-Type", (byte)0x52);
@@ -604,7 +603,7 @@ namespace Dicom.Network
         /// <param name="raw">PDU buffer</param>
         public void Read(RawPDU raw)
         {
-            uint l = raw.Length - 6;
+            long l = raw.Length - 6;
 
             ushort protocolVersion = raw.ReadUInt16("Version");
             raw.SkipBytes("Reserved", 2);
@@ -617,11 +616,15 @@ namespace Dicom.Network
             {
                 byte type = raw.ReadByte("Item-Type");
                 raw.SkipBytes("Reserved", 1);
-                ushort il = raw.ReadUInt16("Item-Length");
-                ushort originalItemLength = il;
+                int il = raw.ReadUInt16("Item-Length");//cast to int to avoid overflow in case of invalid length
+                ushort originalItemLength = (ushort) il;
                 long ilPos = raw.StreamPosition;
 
                 l -= 4 + (uint)il;
+                if(l < 0)
+                {
+                    throw new InvalidDataException("Invalid item length found in PDU: " + il.ToString());
+                }
 
                 if (type == 0x10)
                 {
@@ -636,6 +639,10 @@ namespace Dicom.Network
                     {
                         raw.SkipBytes("Reserved", 3);
                         il -= 4;
+                        if(il < 0)
+                        {
+                            throw new InvalidDataException("Invalid item length found in PDU: " + il.ToString());
+                        }
 
                         while (il > 0)
                         {
@@ -677,6 +684,10 @@ namespace Dicom.Network
                                 }
                             }
                             il -= (ushort)(4 + pl);
+                            if(il < 0)
+                            {
+                                throw new InvalidDataException("Invalid item length found in PDU: " + il.ToString());
+                            }
                         }
                     }
                     catch (DicomException)
@@ -698,10 +709,14 @@ namespace Dicom.Network
                         byte ut = raw.ReadByte("User Information Item-Type");
                         raw.SkipBytes("Reserved", 1);
                         ushort ul = raw.ReadUInt16("User Information Item-Length");
-                        il -= (ushort)(4 + ul);
+                        il -= (4 + ul);
+                        if(il < 0)
+                        {
+                            throw new InvalidDataException("Invalid item length found in PDU: " + il.ToString());
+                        }
                         if (ut == 0x51)
                         {
-                            _assoc.MaximumPDULength = raw.ReadUInt32("Max PDU Length");
+                            _assoc.MaximumPDULength = Math.Min(DicomAssociation.MaxPduPayloadLength, raw.ReadUInt32("Max PDU Length"));
                         }
                         else if (ut == 0x52)
                         {
@@ -920,7 +935,11 @@ namespace Dicom.Network
             _assoc.MaxAsyncOpsInvoked = 1;
             _assoc.MaxAsyncOpsPerformed = 1;
 
-            uint l = raw.Length - 6;
+            long l = raw.Length - 6;
+            if((l-68) < 0)
+            {
+                throw new InvalidDataException("PDU length is too short: " + l.ToString());
+            }
             ushort c = 0;
 
             ushort protocolVersion = raw.ReadUInt16("Version");
@@ -932,6 +951,10 @@ namespace Dicom.Network
 
             while (l > 0)
             {
+                if(l < 1)
+                {
+                    throw new InvalidDataException("Invalid item length found in PDU: " + l.ToString());
+                }
                 byte type = raw.ReadByte("Item-Type");
                 l -= 1;
 
@@ -942,6 +965,10 @@ namespace Dicom.Network
                     c = raw.ReadUInt16("Item-Length");
                     raw.SkipBytes("Value", (int)c);
                     l -= 3 + (uint)c;
+                    if(l< 0)
+                    {
+                        throw new InvalidDataException("Invalid item length found in PDU: " + c.ToString());
+                    }
                 }
                 else if (type == 0x21)
                 {
@@ -955,6 +982,10 @@ namespace Dicom.Network
                     DicomTransferSyntax ts = null;
                     raw.ReadByte("Reserved");
                     l -= (uint)pl + 3;
+                    if(l < 0)
+                    {
+                        throw new InvalidDataException("Invalid item length found in PDU: " + pl.ToString());
+                    }
                     pl -= 4;
                     // When the Result/Reason field has a value other than acceptance (0), this field shall not be significant and its value shall not be tested when received. 
                     if (pl > 0)//should always be greater than zero when pcRes is accepted
@@ -991,6 +1022,10 @@ namespace Dicom.Network
                     raw.ReadByte("Reserved");
                     ushort il = raw.ReadUInt16("User Information Item-Length");
                     l -= (uint)(il + 3);
+                    if(l < 0)
+                    {
+                        throw new InvalidDataException("Invalid item length found in PDU: " + il.ToString());
+                    }
                     while (il > 0)
                     {
                         byte ut = raw.ReadByte("User Item-Type");
@@ -1046,6 +1081,10 @@ namespace Dicom.Network
                     ushort il = raw.ReadUInt16("User Item-Length");
                     raw.SkipBytes("Unknown User Item", il);
                     l -= (uint)(il + 3);
+                    if(l < 0)
+                    {
+                        throw new InvalidDataException("Invalid item length found in PDU: " + il.ToString());
+                    }
                 }
             }
         }
