@@ -103,7 +103,7 @@ namespace Dicom.Network
         /// <param name="stream">Network stream.</param>
         /// <param name="fallbackEncoding">Fallback encoding.</param>
         /// <param name="log">Logger</param>
-        protected DicomService(INetworkStream stream, Encoding fallbackEncoding, Logger log)
+        protected DicomService(INetworkStream stream, Encoding fallbackEncoding, Logger log, DicomServiceOptions options = null)
         {
             _ConnectTimeUTC = DateTime.UtcNow;
             AssociationState = DicomAssociationState.None;
@@ -124,8 +124,14 @@ namespace Dicom.Network
             IsConnected = true;
             _fallbackEncoding = fallbackEncoding ?? DicomEncoding.Default;
             Logger = log ?? LogManager.GetLogger("Dicom.Network");
-            Options = DicomServiceOptions.Default;
-
+            if (options != null)
+            {
+                Options = options;
+            }
+            else
+            {
+                Options = DicomServiceOptions.Default;
+            }
             _pduListener = ListenAndProcessPDUAsync();
         }
 
@@ -187,7 +193,17 @@ namespace Dicom.Network
         /// <summary>
         /// Gets whether or not the service is connected.
         /// </summary>
-        public bool IsConnected { get; private set; }
+        public bool IsConnected {
+            get {
+                return _IsConnected;
+            }
+            private set
+            {
+                _IsConnected = value;
+            }
+        }
+
+        private volatile bool _IsConnected = false;
 
         public bool IsEncrypted
         {
@@ -710,8 +726,9 @@ namespace Dicom.Network
                                     }
                                     catch (Exception ex)
                                     {
-                                        Logger.Error("Error reading assocaition request: " + ex.Message);
-                                        Logger.Debug("Error reading assocaition request: " + ex.Message + "\n" + ex.StackTrace);
+                                        Logger.Error("Error reading association request: " + ex.Message);
+                                        Logger.Debug("Error reading association request: " + ex.Message + "\n" + ex.StackTrace);
+                                        throw;
                                     }
                                     LogID = Association.CallingAE + " (" + Association.AssociationId.ToString() + ")";
                                     if (Options.UseRemoteAEForLogName)
