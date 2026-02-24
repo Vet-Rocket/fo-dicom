@@ -35,6 +35,12 @@ namespace Dicom.Network
 
         private readonly object _clientLocker = new object();
 
+        private readonly ushort _maxActiveClients;
+
+        private readonly ushort _maxConnectionsPerIp;
+        //only access inside lock(_clientLocker)
+        private readonly Dictionary<string, int> _ipConnectionCounts = new Dictionary<string, int>();
+
         #endregion
 
         #region CONSTRUCTORS
@@ -53,8 +59,12 @@ namespace Dicom.Network
             string certificateName = null,
             DicomServiceOptions options = null,
             Encoding fallbackEncoding = null,
-            Logger logger = null)
+            Logger logger = null,
+            ushort maxActiveClients = 100,
+            ushort maxClientsPerIP = 5)
         {
+            this._maxActiveClients = maxActiveClients;
+            this._maxConnectionsPerIp = maxClientsPerIP;
             this.Port = port;
             this.certificateName = certificateName;
             this.fallbackEncoding = fallbackEncoding;
@@ -146,6 +156,14 @@ namespace Dicom.Network
                 this.cancellationSource.Dispose();
                 lock (_clientLocker)
                 {
+                    for(int i = clients.Count - 1; i >= 0; i--)
+                    {
+                        try
+                        {
+                            this.clients[i]?.Dispose();
+                        }
+                        catch { }
+                    }
                     this.clients.Clear();
                 }
             }
@@ -189,7 +207,7 @@ namespace Dicom.Network
         /// <returns>An instance of the DICOM service class.</returns>
         protected virtual T CreateScp(INetworkStream stream)
         {
-            return (T)Activator.CreateInstance(typeof(T), stream, this.fallbackEncoding, this.Logger);
+            return (T)Activator.CreateInstance(typeof(T), stream, this.fallbackEncoding, this.Logger, this.Options);
         }
 
         /// <summary>
@@ -226,14 +244,30 @@ namespace Dicom.Network
                                 {
                                     if (!task.IsFaulted)
                                     {
-                                        var scp = this.CreateScp(task.Result);//move options to constructor??
-                                        if (this.Options != null)
-                                        {
-                                            scp.Options = this.Options;
-                                        }
                                         lock (_clientLocker)
                                         {
-                                            this.clients.Add(scp);
+                                            var stream = task.Result;
+                                            string remoteIp = stream.RemoteHost;
+                                            if (clients.Count > _maxActiveClients)
+                                            {
+                                                this.Logger.Warn($"Maximum active client limit of {_maxActiveClients} reached. Refusing new connection from IP {remoteIp}.");
+                                                tcpClient.Close();
+                                            }
+                                            else
+                                            {
+                                                int count = _ipConnectionCounts.ContainsKey(remoteIp) ? _ipConnectionCounts[remoteIp] : 0;
+                                                if (count >= _maxConnectionsPerIp)
+                                                {
+                                                    this.Logger.Warn($"Connection limit reached for IP {remoteIp}. Refusing new connection.");
+                                                    tcpClient.Close();
+                                                }
+                                                else
+                                                {
+                                                    var scp = this.CreateScp(stream);//move options to constructor??
+                                                    _ipConnectionCounts[stream.RemoteHost] = count + 1;
+                                                    this.clients.Add(scp);
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -334,8 +368,10 @@ namespace Dicom.Network
                     await Task.Delay(1000, this.cancellationSource.Token).ConfigureAwait(false);
                     lock (_clientLocker)
                     {
+                        _ipConnectionCounts.Clear();//will reset counts for active connections
                         for (int i = clients.Count - 1; i >= 0; i--)
                         {
+                            bool shouldRemove = false;
                             var curClient = this.clients[i];
                             if (curClient == null)
                             {
@@ -348,15 +384,28 @@ namespace Dicom.Network
                                 //wait one second to dispose everything
                                 if (!curClient.IsConnected && elapsed.TotalSeconds > 1)
                                 {
-                                    curClient.Dispose();
-                                    this.clients.RemoveAt(i);
+                                    shouldRemove = true;
                                 }
                                 else if (elapsed.TotalMinutes > 10) //close connections with no recent activity
                                 {
                                     this.Logger.Warn("Client " + curClient.RemoteHost + " has no activity since " + lastActiveUTC.ToString() + " (UTC), disconnecting");
-                                    curClient.Dispose();
-                                    this.clients.RemoveAt(i);
+                                    shouldRemove = true;
                                 }
+                            }
+                            if (shouldRemove)
+                            {
+                                try
+                                {
+                                    curClient?.Dispose();
+                                }
+                                catch { }
+                                this.clients.RemoveAt(i);
+                            }
+                            else
+                            {
+                                string remoteIp = curClient.RemoteHost;
+                                int count = _ipConnectionCounts.ContainsKey(remoteIp) ? _ipConnectionCounts[remoteIp] : 0;
+                                _ipConnectionCounts[remoteIp] = count + 1;
                             }
                         }
                     }
@@ -400,13 +449,15 @@ namespace Dicom.Network
         /// <param name="options">Service options.</param>
         /// <param name="fallbackEncoding">Fallback encoding.</param>
         /// <param name="logger">Logger, if null default logger will be applied.</param>
+        /// <param name="maxActiveClients">Maximum number of active clients that can be connected to the server at the same time.</param>
+        /// <param name="maxClientsPerIP">Maximum number of clients from the same IP address that can be connected to the server at the same time.</param>
         /// <returns>An instance of <see cref="DicomServer{T}"/>, that starts listening for connections in the background.</returns>
         public static IDicomServer Create<T>(
             int port,
             string certificateName = null,
             DicomServiceOptions options = null,
             Encoding fallbackEncoding = null,
-            Logger logger = null) where T : DicomService, IDicomServiceProvider
+            Logger logger = null, ushort maxActiveClients = 100, ushort maxClientsPerIP = 5) where T : DicomService, IDicomServiceProvider
         {
             if (Servers.Any(server => server.Port == port))
             {
@@ -416,7 +467,7 @@ namespace Dicom.Network
 #pragma warning disable CS0618 // Type or member is obsolete
             lock (locker)
             {
-                return new DicomServer<T>(port, certificateName, options, fallbackEncoding, logger);
+                return new DicomServer<T>(port, certificateName, options, fallbackEncoding, logger, maxActiveClients, maxClientsPerIP);
             }
 #pragma warning restore CS0618 // Type or member is obsolete
         }
