@@ -47,10 +47,50 @@ namespace Dicom.Network
         public DicomAssociation(string callingAe, string calledAe, uint maxPduLength = 16384)
             : this()
         {
-            CallingAE = callingAe;
-            CalledAE = calledAe;
+            CallingAE = SanitizeAE(callingAe);
+            CalledAE = SanitizeAE(calledAe);
             MaximumPDULength = maxPduLength;
         }
+
+        public static string SanitizeAE(string aeTitle, bool enforceDicomWhitelist = true, char replacement = '_')
+        {
+            if (string.IsNullOrEmpty(aeTitle)) return string.Empty;
+
+            // AE Titles are typically space-padded to length 16; trimming is safe for display/logging.
+            var input = aeTitle.TrimEnd(' ');
+
+            var sb = new StringBuilder(input.Length);
+            foreach (var ch in input)
+            {
+                // Strip/replace ASCII control chars (includes \r, \n, \t, ESC, DEL).
+                if (ch <= 0x1F || ch == 0x7F)
+                {
+                    sb.Append(replacement);
+                    continue;
+                }
+
+                if (!enforceDicomWhitelist)
+                {
+                    sb.Append(ch);
+                    continue;
+                }
+
+                // DICOM PS 3.7 (commonly enforced): uppercase letters, digits, space, underscore.
+                if ((ch >= 'A' && ch <= 'Z') ||
+                    (ch >= '0' && ch <= '9') ||
+                    ch == ' ' || ch == '_')
+                {
+                    sb.Append(ch);
+                }
+                else
+                {
+                    sb.Append(replacement);
+                }
+            }
+
+            return sb.ToString();
+        }
+    
 
         public ushort AssociationId
         {
