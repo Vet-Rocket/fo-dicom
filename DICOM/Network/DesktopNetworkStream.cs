@@ -311,11 +311,15 @@ namespace Dicom.Network
             return null;
         }
 
-        public bool IsConnected()
+        public bool IsConnected
         {
-            Socket sock = GetSocket();
-            if (sock != null) return sock.Connected;
-            return false;
+            get
+            {
+
+                Socket sock = GetSocket();
+                if (sock != null) return sock.Connected;
+                return false;
+            }
         }
 
         /// <summary>

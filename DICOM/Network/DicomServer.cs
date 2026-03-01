@@ -263,7 +263,7 @@ namespace Dicom.Network
                                                 }
                                                 else
                                                 {
-                                                    var scp = this.CreateScp(stream);//move options to constructor??
+                                                    var scp = this.CreateScp(stream);
                                                     _ipConnectionCounts[stream.RemoteHost] = count + 1;
                                                     this.clients.Add(scp);
                                                 }

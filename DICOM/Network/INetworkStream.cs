@@ -33,6 +33,8 @@ namespace Dicom.Network
         /// </summary>
         int LocalPort { get; }
 
+        bool IsConnected { get; }
+
         bool Encrypted { get; }
 
         bool Authenticated { get; }

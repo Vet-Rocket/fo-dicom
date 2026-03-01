@@ -121,7 +121,7 @@ namespace Dicom.Network
             _receivedProcessing = new List<DicomRequest>();
             _pDataTasks = new List<Task>();
 
-            IsConnected = true;
+            _IsActive = true;
             _fallbackEncoding = fallbackEncoding ?? DicomEncoding.Default;
             Logger = log ?? LogManager.GetLogger("Dicom.Network");
             if (options != null)
@@ -195,21 +195,22 @@ namespace Dicom.Network
         /// </summary>
         public bool IsConnected {
             get {
-                return _IsConnected;
+                return _IsActive;
             }
             private set
             {
-                _IsConnected = value;
+                _IsActive = value;
             }
         }
-
-        private volatile bool _IsConnected = false;
+        //more accurate name than IsConnected since stream my still be open but service is stopping or stopped and not processing messages;
+        //also allows for distinguishing between not connected and connection lost during processing
+        private volatile bool _IsActive = false;
 
         public bool IsEncrypted
         {
             get
             {
-                if (IsConnected && this._network != null)
+                if (_IsActive && this._network != null)
                 {
                     return this._network.Encrypted;
                 }
@@ -221,7 +222,7 @@ namespace Dicom.Network
         {
             get
             {
-                if (IsConnected && this._network != null)
+                if (_IsActive && this._network != null)
                 {
                     return this._network.Authenticated;
                 }
@@ -290,10 +291,15 @@ namespace Dicom.Network
         {
             if (_disposed) return;
 
-            IsConnected = false;
+            _IsActive = false;
             if (disposing)
             {
                 _dimseStream?.Dispose();
+                //Not necessary, Desktopfilereference will delete the file in the destructor
+                //if (_dimseStreamFile != null && _dimseStreamFile is DesktopFileReference)
+                //{
+                //    ((DesktopFileReference)_dimseStreamFile)?.Delete();
+                //}
                 int nCount = 0;
                 lock (_networkCounterLock)
                 {
@@ -461,7 +467,7 @@ namespace Dicom.Network
         /// <returns>Awaitable task.</returns>
         protected async Task SendPDUAsync(PDU pdu)
         {
-            if (!IsConnected)
+            if (!_IsActive)
             {
                 string logMsg = "PDU cannot be queued due to no connection: " + (pdu.GetType()).Name;
                 if (LogID != null) logMsg = LogID + " " + logMsg;
@@ -498,13 +504,15 @@ namespace Dicom.Network
                     if (_pduQueue.Count < MaximumPDUsInQueue) _pduQueueWatcher.Set();
                 }
 
-                if (!IsConnected)
+                if (!_IsActive)
                 {
+                    lock(_lock) _writing = false;
                     string notConnected = "PDU cannot be sent due to no connection: " + (pdu.GetType()).Name;
                     if (LogID != null) notConnected = LogID + " " + notConnected;
                     Logger.Warn(notConnected);
                     return;
-                }
+                }                
+
                 // if (Options.LogDataPDUs && pdu is PDataTF) Logger.Info("{logId} -> Ready to send {pdu}", LogID, pdu);
                 if (Options.LogDataPDUs) Logger.Debug("{logId} -> Ready to send PDU {pdu}", LogID, pdu);
 
@@ -574,11 +582,10 @@ namespace Dicom.Network
                 }
                 finally
                 {
+                    lock (_lock) _writing = false;
                     TimeSpan elapsed = DateTime.UtcNow - start;
                     CalcSpeed(bytesToWrite, elapsed.TotalMilliseconds, true, forceCalcSpeed);
                 }
-
-                lock (_lock) _writing = false;
             }
         }
         /// <summary>
@@ -626,7 +633,7 @@ namespace Dicom.Network
                 RawPDU raw = null;
                 try
                 {
-                    while (IsConnected)
+                    while (_IsActive)
                     {
                         var stream = _network.AsStream();
 
@@ -643,7 +650,7 @@ namespace Dicom.Network
                         {
                             if (count == 0)
                             {
-                                if (IsConnected)
+                                if (_IsActive)
                                 {
                                     string logMsg = "";
                                     if (LogID != null) logMsg = LogID;
@@ -1624,7 +1631,7 @@ namespace Dicom.Network
         {
             try
             {
-                if (!IsConnected) return true;
+                if (!_IsActive) return true;
 
                 lock (_lock)
                 {
@@ -1690,7 +1697,7 @@ namespace Dicom.Network
                 {
                     Logger.Info(logMsg);
                 }
-                lock (_lock) IsConnected = false;
+                lock (_lock) _IsActive = false;
                 try
                 {
                     (this as IDicomService)?.OnConnectionClosed(exception);
@@ -1700,16 +1707,13 @@ namespace Dicom.Network
                     Logger.Error("Error during OnConnectionClosed: {@error}", occx.Message);
                     Logger.Debug("Error during OnConnectionClosed: \n" + occx.Message + "\n" + occx.StackTrace);
                 }
-
-                //throwing here just bubbles out... why do that?
-                //if (exception != null) throw exception;
                 return true;
             }
             catch (Exception e)
             {
                 Logger.Error("Error during close attempt! {@error}", e.Message);
                 Logger.Debug("Error during close attempt: \n" + e.Message + "\n" + e.StackTrace);
-                throw;
+                throw;//hmm...
             }
         }
 
