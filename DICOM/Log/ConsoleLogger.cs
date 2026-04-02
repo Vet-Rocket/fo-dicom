@@ -15,7 +15,17 @@ namespace Dicom.Log
         /// </summary>
         public static readonly Logger Instance = new ConsoleLogger();
 
-        private readonly object @lock = new object();
+        private readonly object _locker = new object();
+
+        private LogLevel _LogLevel = LogLevel.Info;
+
+        public void SetLogLevel(LogLevel level)
+        {
+            lock (_locker)
+            {
+                this._LogLevel = level;
+            }
+        }
 
         /// <summary>
         /// Initializes an instance of the <see cref="ConsoleLogger"/>.
@@ -32,8 +42,13 @@ namespace Dicom.Log
         /// <param name="args">Log message arguments.</param>
         public override void Log(LogLevel level, string msg, params object[] args)
         {
-            lock (this.@lock)
+            lock (this._locker)
             {
+                if(level < LogLevel.Debug || level > LogLevel.Fatal || level < _LogLevel)
+                {
+                    return;
+                }
+                string levelStr = "["+level.ToString().ToUpper()+"] ";
                 var previous = ConsoleForegroundColor;
                 switch (level)
                 {
@@ -55,7 +70,7 @@ namespace Dicom.Log
                     default:
                         throw new ArgumentOutOfRangeException("level", level, null);
                 }
-                Console.WriteLine(NameFormatToPositionalFormat(msg), args);
+                Console.WriteLine(levelStr + NameFormatToPositionalFormat(msg), args);
                 ConsoleForegroundColor = previous;
             }
         }

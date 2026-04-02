@@ -120,6 +120,8 @@ namespace Dicom.Network
             get
             {
                 if (service != null) return service.IsConnected;
+                //service might not yet be initiated, but network stream might already be connected
+                if (networkStream != null) return networkStream.IsConnected;
                 return false;
             }
         }
@@ -495,7 +497,8 @@ namespace Dicom.Network
                     Logger.Warn(logMsg);
                     Abort();
                 }
-                var associated = await associateNotifier.Task.ConfigureAwait(false);
+                //var associated = await associateNotifier.Task.ConfigureAwait(false);
+                var associated = await AwaitWithTimeout(associateNotifier.Task, 5000, "Association Request", Logger).ConfigureAwait(false);
 
                 bool send;
                 lock (locker)
@@ -528,12 +531,24 @@ namespace Dicom.Network
                 }
                 else if (associated)
                 {
-                    await service.DoSendAssociationReleaseRequestAsync().ConfigureAwait(false);
+                    //await service.DoSendAssociationReleaseRequestAsync().ConfigureAwait(false);
+                    Logger.Warn("No requests to send, releasing association");
+                    var releaseTask = service.DoSendAssociationReleaseRequestAsync();
+                    await AwaitWithTimeout(releaseTask, 5000, "Association Release", Logger).ConfigureAwait(false);
                 }
-
-                await completeNotifier.Task.ConfigureAwait(false);
+                int completionTimeout = 1200000; // Default to 0 minutes, which is a reasonable upper bound for a large C-STORE operation to complete.
+#if DEBUG
+                completionTimeout = 60000; // Shorter timeout for debug mode to speed up testing of failure scenarios.
+#endif
+                //await completeNotifier.Task.ConfigureAwait(false);
+                await AwaitWithTimeout(completeNotifier.Task, completionTimeout, "Association completion", Logger).ConfigureAwait(false);
             }
-            catch(DicomAssociationRejectedException rx)
+            catch (TimeoutException te)
+            {
+                Logger.Warn("Failed to send due to timeout: {@error}", te);
+                Abort();
+            }
+            catch (DicomAssociationRejectedException rx)
             {
                 Logger.Warn("Failed to send due to Association Rejection: {@error}", rx);
             }
@@ -577,6 +592,30 @@ namespace Dicom.Network
                 // ReSharper disable once PossibleNullReferenceException
                 throw lingerException.Flatten().InnerException;
             }
+        }
+
+        private async Task<T> AwaitWithTimeout<T>(Task<T> task, int millisecondsTimeout, string context, Logger logger)
+        {
+            var timeoutTask = Task.Delay(millisecondsTimeout);
+            var completedTask = await Task.WhenAny(task, timeoutTask).ConfigureAwait(false);
+            if (completedTask == timeoutTask)
+            {
+                logger.Warn($"{context} timed out after {millisecondsTimeout} ms");
+                throw new TimeoutException($"{context} timed out after {millisecondsTimeout} ms");
+            }
+            return await task.ConfigureAwait(false);
+        }
+
+        private async Task AwaitWithTimeout(Task task, int millisecondsTimeout, string context, Logger logger)
+        {
+            var timeoutTask = Task.Delay(millisecondsTimeout);
+            var completedTask = await Task.WhenAny(task, timeoutTask).ConfigureAwait(false);
+            if (completedTask == timeoutTask)
+            {
+                logger.Warn($"{context} timed out after {millisecondsTimeout} ms");
+                throw new TimeoutException($"{context} timed out after {millisecondsTimeout} ms");
+            }
+            return;
         }
 
         public void Dispose()
