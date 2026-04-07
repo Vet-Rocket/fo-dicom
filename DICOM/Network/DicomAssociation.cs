@@ -52,33 +52,20 @@ namespace Dicom.Network
             MaximumPDULength = maxPduLength;
         }
 
-        public static string SanitizeAE(string aeTitle, bool enforceDicomWhitelist = true, char replacement = '_')
+        public static string SanitizeAE(string aeTitle, char replacement = '_')
         {
             if (string.IsNullOrEmpty(aeTitle)) return string.Empty;
 
-            // AE Titles are typically space-padded to length 16; trimming is safe for display/logging.
+            // AE Titles are space-padded to length 16; trim trailing spaces.
             var input = aeTitle.TrimEnd(' ');
 
             var sb = new StringBuilder(input.Length);
             foreach (var ch in input)
             {
-                // Strip/replace ASCII control chars (includes \r, \n, \t, ESC, DEL).
-                if (ch <= 0x1F || ch == 0x7F)
-                {
-                    sb.Append(replacement);
-                    continue;
-                }
-
-                if (!enforceDicomWhitelist)
-                {
-                    sb.Append(ch);
-                    continue;
-                }
-
-                // DICOM PS 3.7 (commonly enforced): uppercase letters, digits, space, underscore.
-                if ((ch >= 'A' && ch <= 'Z') ||
-                    (ch >= '0' && ch <= '9') ||
-                    ch == ' ' || ch == '_')
+                // DICOM PS 3.5 §6.2: AE is Default Character Repertoire (printable ASCII)
+                // excluding backslash (0x5C), which is the DICOM value delimiter.
+                // Valid range: 0x20 (space) through 0x7E (~), minus backslash.
+                if (ch >= 0x20 && ch <= 0x7E && ch != '\\')
                 {
                     sb.Append(ch);
                 }

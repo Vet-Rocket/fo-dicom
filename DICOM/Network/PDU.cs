@@ -607,8 +607,8 @@ namespace Dicom.Network
 
             ushort protocolVersion = raw.ReadUInt16("Version");
             raw.SkipBytes("Reserved", 2);
-            _assoc.CalledAE = raw.ReadString("Called AE", 16);
-            _assoc.CallingAE = raw.ReadString("Calling AE", 16);
+            _assoc.CalledAE = DicomAssociation.SanitizeAE(raw.ReadString("Called AE", 16));
+            _assoc.CallingAE = DicomAssociation.SanitizeAE(raw.ReadString("Calling AE", 16));
             raw.SkipBytes("Reserved", 32);
             l -= 2 + 2 + 16 + 16 + 32;
 
