@@ -117,11 +117,17 @@ namespace Dicom.Network
         {
             try
             {
-                X509Certificate2Collection certs = null;
+                // Prefer time-valid certs and pick the one with the latest NotAfter, so renewals (which often
+                // leave the old cert next to the new one in LocalMachine\My) don't silently regress to the expired cert.
+                X509Certificate2Collection certs;
                 using (var store = new X509Store(StoreName.My, StoreLocation.LocalMachine))
                 {
                     store.Open(OpenFlags.ReadOnly);
-                    certs = store.Certificates.Find(X509FindType.FindBySubjectName, certificateName, false);
+                    certs = store.Certificates.Find(X509FindType.FindBySubjectName, certificateName, true);
+                    if (certs.Count == 0)
+                    {
+                        certs = store.Certificates.Find(X509FindType.FindBySubjectName, certificateName, false);
+                    }
                 }
 
                 if (certs.Count == 0)
@@ -129,7 +135,11 @@ namespace Dicom.Network
                     using (var store = new X509Store("WebHosting", StoreLocation.LocalMachine))
                     {
                         store.Open(OpenFlags.ReadOnly);
-                        certs = store.Certificates.Find(X509FindType.FindBySubjectName, certificateName, false);
+                        certs = store.Certificates.Find(X509FindType.FindBySubjectName, certificateName, true);
+                        if (certs.Count == 0)
+                        {
+                            certs = store.Certificates.Find(X509FindType.FindBySubjectName, certificateName, false);
+                        }
                     }
                 }
                 if (certs.Count == 0)
@@ -137,6 +147,10 @@ namespace Dicom.Network
                     throw new DicomNetworkException("Unable to find certificate for " + certificateName);
                 }
                 X509Certificate2 cert = certs[0];
+                foreach (X509Certificate2 c in certs)
+                {
+                    if (c.NotAfter > cert.NotAfter) cert = c;
+                }
                 //check that we can access the private key, which we need to to to authenticate as server
                 const String RSA = "1.2.840.113549.1.1.1";
                 const String DSA = "1.2.840.10040.4.1";
