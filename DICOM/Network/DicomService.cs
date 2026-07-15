@@ -944,6 +944,23 @@ namespace Dicom.Network
                                 file.Dataset.Add(DicomTag.SOPInstanceUID, sopUid);
 
                                 CreateCStoreReceiveStream(file);
+
+                                // If the override could not create a receive stream (for example the
+                                // incoming file stayed locked by another process even after retries),
+                                // _dimseStream will be null. Do NOT fall through to the
+                                // _dimseStream.WriteAsync call below with a null stream: that
+                                // NullReferenceException would propagate out of ProcessPDataTFAsync
+                                // and tear down the entire association (every queued instance on the
+                                // connection would fail, not just this one). Fall back to a MemoryStream
+                                // so this single instance degrades gracefully - the file-meta preamble
+                                // was never written into it, so GetCStoreDicomFile() will throw and the
+                                // per-instance handler further down sends a C-STORE failure response,
+                                // which prompts the sender to resend just this instance.
+                                if (_dimseStream == null)
+                                {
+                                    _dimseStream = new MemoryStream();
+                                    _dimseStreamFile = null;
+                                }
                             }
                             else
                             {

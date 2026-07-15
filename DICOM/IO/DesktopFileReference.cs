@@ -139,7 +139,23 @@ namespace Dicom.IO
         /// <returns></returns>
         public Stream Open()
         {
-            var stream = new ReferenceStream(File.Open(this.Name, FileMode.Open, FileAccess.ReadWrite));
+            // Open with FileShare.Read instead of the implicit FileShare.None that the
+            // 3-argument File.Open overload uses.
+            //
+            // This method is used only by the C-STORE receive path, and is called the instant
+            // after the incoming .tmp file has been created and closed. On Windows, closing a
+            // freshly written file causes antivirus / search-indexer / backup filter drivers to
+            // open it to scan it. Those scanners open read-only with a permissive share mode, so
+            // they do not intend to block us - but FileShare.None means "no other handle to this
+            // file may exist at all while I hold it." When a scanner still has its read handle
+            // open, our open loses that race and fails with a sharing violation
+            // ("the process cannot access the file because it is being used by another process").
+            //
+            // We are the only process that ever writes this file, so permitting concurrent
+            // readers is safe: a reader cannot corrupt our write. We deliberately do NOT permit
+            // FileShare.Write, because no second writer is ever expected.
+            var stream = new ReferenceStream(
+                File.Open(this.Name, FileMode.Open, FileAccess.ReadWrite, FileShare.Read));
             streamList.Add(stream);
             return stream;
         }
