@@ -672,7 +672,7 @@ namespace Dicom.Network
                                             pc.AddTransferSyntax(ptx);
                                         }
                                     }
-                                    catch (DicomDataException tsx)
+                                    catch (DicomDataException)
                                     {
                                         //failed toparse transfer syntax?
                                         throw new InvalidDataException("Could not parse or add Transfer Syntax: " + sx);

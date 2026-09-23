@@ -94,7 +94,6 @@ namespace Dicom
         {
             string result = "";
             int errCount = 0;
-            int indentSize = 4;
             DicomDictionary dict = DicomDictionary.Default;
             foreach (var item in dds)
             {

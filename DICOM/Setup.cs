@@ -48,7 +48,7 @@ namespace Dicom
 
                 return instance;
             }
-            catch (Exception x)
+            catch (Exception)
             {
                 return null;
             }

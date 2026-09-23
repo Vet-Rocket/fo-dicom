@@ -34,8 +34,9 @@ namespace Dicom.Network
 
         private int asyncPerformed;
 
+        //only set by GetNetworkStream, i.e. a stream this client created and owns; Dispose() closes it.
+        //Caller-supplied streams (Send/SendAsync(INetworkStream, ...)) are never stored here.
         private INetworkStream networkStream;
-        private bool ownsNetworkStream = false;
 
         private bool aborted;
 
@@ -322,7 +323,6 @@ namespace Dicom.Network
             var ignoreSslPolicyErrors = Options?.IgnoreSslPolicyErrors
                                         ?? DicomServiceOptions.Default.IgnoreSslPolicyErrors;
             this.networkStream = NetworkManager.CreateNetworkStream(host, port, useTls, noDelay, ignoreSslPolicyErrors, certificateName);
-            this.ownsNetworkStream = true;
             return this.networkStream;
         }
 

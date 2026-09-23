@@ -23,8 +23,6 @@ namespace Dicom
 
         private DicomTransferSyntax _syntax;
 
-        private bool _isDisposed = false; // To detect redundant calls
-
         private Encoding _DataSetEncoding = null;
 
         public Encoding DataSetEncoding
