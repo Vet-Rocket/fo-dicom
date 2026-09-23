@@ -82,9 +82,11 @@ namespace Dicom
             : base(tag, EmptyBuffer.Value)
         {
             Encoding = encoding;
-            Buffer = ByteConverter.ToByteBuffer(value ?? String.Empty, encoding, ValueRepresentation.PaddingValue);
+            _SourceValue = value ?? String.Empty;
+            Buffer = ByteConverter.ToByteBuffer(_SourceValue, encoding, ValueRepresentation.PaddingValue);
         }
 
+        //read from a stream or file: the bytes are the only true value, so there is no source string
         protected DicomStringElement(DicomTag tag, Encoding encoding, IByteBuffer buffer)
             : base(tag, buffer)
         {
@@ -92,6 +94,24 @@ namespace Dicom
         }
 
         public Encoding Encoding { get; protected set; }
+
+        private readonly string _SourceValue = null;
+
+        /// <summary>
+        /// The .NET string this element was created from, before encoding; null if it was built
+        /// from raw bytes. Encoding can be lossy (ASCII turns non-ASCII into '?'), so this is kept
+        /// so DicomDataset can re-encode losslessly when its Specific Character Set changes after
+        /// the element was added. Get&lt;string&gt;() still decodes Buffer, so reads reflect what
+        /// will actually be written. Valid because a string element's Buffer never changes after
+        /// construction; changing a value means creating a new element.
+        /// </summary>
+        internal string SourceValue
+        {
+            get
+            {
+                return _SourceValue;
+            }
+        }
 
         /// <summary>Gets the number of values that the DICOM element contains.</summary>
         /// <value>Number of value items</value>

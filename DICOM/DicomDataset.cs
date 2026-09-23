@@ -1278,7 +1278,15 @@ namespace Dicom
                 else if (item is DicomStringElement)
                 {
                     string[] oldValues;
-                    if (item is DicomMultiStringElement)
+                    string sourceValue = (item as DicomStringElement).SourceValue;
+                    if (sourceValue != null)
+                    {
+                        //lossless: re-encode the original string, not bytes an earlier encoding may have
+                        //degraded. Multi-valued elements keep the joined "a\b" form; the element
+                        //constructors join values with '\' anyway, so the result is the same.
+                        oldValues = new string[] { sourceValue };
+                    }
+                    else if (item is DicomMultiStringElement)
                     {
                         oldValues = (item as DicomMultiStringElement).Get<string[]>();
                     }
