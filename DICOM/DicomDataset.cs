@@ -85,7 +85,9 @@ namespace Dicom
                             ((DicomSequence)item).Items.Where(dataset => dataset != null)
                                 .Select(dataset => new DicomDataset(dataset))
                                 .ToArray();
-                        _items[tag] = new DicomSequence(tag, sequenceItems);
+                        var sequence = new DicomSequence(tag, sequenceItems);
+                        AttachSequence(sequence);
+                        _items[tag] = sequence;
                     }
                     else
                     {
@@ -799,6 +801,7 @@ namespace Dicom
                             item.Tag = tag;
                         }
                         CheckForCharacterSet(item);
+                        AttachSequence(item);
                         if (ValidateItems) item.Validate();
                         _items[tag] = item;
                     }
@@ -816,6 +819,7 @@ namespace Dicom
                             item.Tag = tag;
                         }
                         CheckForCharacterSet(item);
+                        AttachSequence(item);
                         if (ValidateItems) item.Validate();
                         _items.Add(tag, item);
                     }
@@ -843,6 +847,7 @@ namespace Dicom
                 }
                 if (ValidateItems) item.Validate();
                 CheckForCharacterSet(item);
+                AttachSequence(item);
                 if (allowUpdate)
                 {
                     _items[tag] = item;
@@ -866,6 +871,28 @@ namespace Dicom
                     UpdateEncoding(newEncoding);
                 }
             }
+        }
+
+        /// <summary>
+        /// A sequence entering this dataset passes this dataset's encoding down to its items, now and
+        /// for any item added to it later (PS3.5 7.5.3: an item without its own Specific Character Set
+        /// uses the encapsulating dataset's).
+        /// </summary>
+        private void AttachSequence(DicomItem item)
+        {
+            var sequence = item as DicomSequence;
+            if (sequence != null) sequence.SetInheritedEncoding(this.DataSetEncoding);
+        }
+
+        /// <summary>
+        /// Applies the encapsulating dataset's encoding to this sequence item. An item with its own
+        /// Specific Character Set keeps it (PS3.5 7.5.3), and its own children inherit from it.
+        /// Re-encoding is lossless for strings built from .NET strings (DicomStringElement.SourceValue).
+        /// </summary>
+        internal void InheritEncoding(Encoding inherited)
+        {
+            if (_items.ContainsKey(DicomTag.SpecificCharacterSet)) return;
+            UpdateEncoding(inherited ?? DicomEncoding.Default);
         }
 
         /// <summary>
@@ -1269,11 +1296,8 @@ namespace Dicom
                 if(item.Tag == DicomTag.SpecificCharacterSet) continue;
                 if (item is DicomSequence)
                 {
-                    var seq = item as DicomSequence;
-                    foreach (var ds in seq.Items)
-                    {
-                        ds.UpdateEncoding(newEncoding);
-                    }
+                    //items inherit unless they have their own Specific Character Set
+                    (item as DicomSequence).SetInheritedEncoding(newEncoding);
                 }
                 else if (item is DicomStringElement)
                 {
