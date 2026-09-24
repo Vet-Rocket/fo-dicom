@@ -41,14 +41,14 @@ namespace Dicom
             {
                 yield return new object[] { DicomUID.AbnormalLinesFindingOrFeature6103, DicomUidType.ContextGroupName, false };
                 yield return new object[] { DicomUID.AbstractMultiDimensionalImageModel, DicomUidType.ApplicationHostingModel, false };
-                yield return new object[] { DicomUID.NuclearMedicineImageStorageRETIRED, DicomUidType.SOPClass, true };
-                yield return new object[] { DicomUID.SPM2GRAYFrameOfReference, DicomUidType.FrameOfReference, false };
-                yield return new object[] { DicomUID.GeneralPurposeWorklistInformationModelFINDRETIRED, DicomUidType.SOPClass, true };
+                yield return new object[] { DicomUID.NuclearMedicineImageStorageRetiredRETIRED, DicomUidType.SOPClass, true };
+                yield return new object[] { DicomUID.UTC, DicomUidType.FrameOfReference, false };
+                yield return new object[] { DicomUID.GeneralPurposeWorklistInformationModelFindRETIRED, DicomUidType.SOPClass, true };
                 yield return new object[] { DicomUID.TransducerOrientation6, DicomUidType.ContextGroupName, false };
                 yield return new object[] { DicomUID.UltrasoundTransducerGeometry12033, DicomUidType.ContextGroupName, false };
                 yield return new object[] { DicomUID.ExplicitVRBigEndianRETIRED, DicomUidType.TransferSyntax, true };
                 yield return new object[] { DicomUID.JPEGFullProgressionHierarchical2426RETIRED, DicomUidType.TransferSyntax, true };
-                yield return new object[] { DicomUID.IEC61217PatientSupportPositionParameters9403, DicomUidType.ContextGroupName, false };   // 2015c
+                yield return new object[] { DicomUID.IEC61217PatientSupportPositionParameter9403, DicomUidType.ContextGroupName, false };   // 2015c
             }
         }
         #endregion

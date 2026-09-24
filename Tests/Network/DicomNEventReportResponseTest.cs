@@ -13,7 +13,7 @@ namespace Dicom.Network
         public void EventTypeIDGetter_ResponseCreatedFromRequest_DoesNotThrow()
         {
             var request = new DicomNEventReportRequest(
-                DicomUID.BasicFilmSessionSOPClass,
+                DicomUID.BasicFilmSession,
                 new DicomUID("1.2.3", null, DicomUidType.SOPInstance),
                 1);
             var response = new DicomNEventReportResponse(request, DicomStatus.Success);
@@ -26,7 +26,7 @@ namespace Dicom.Network
         public void SOPInstanceUIDGetter_ResponseCreatedFromRequest_DoesNotThrow()
         {
             var request = new DicomNEventReportRequest(
-                DicomUID.BasicFilmSessionSOPClass,
+                DicomUID.BasicFilmSession,
                 new DicomUID("1.2.3", null, DicomUidType.SOPInstance),
                 1);
             var response = new DicomNEventReportResponse(request, DicomStatus.Success);

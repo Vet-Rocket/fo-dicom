@@ -19,9 +19,9 @@ namespace Dicom.Printing
             if (Directory.Exists(path)) Directory.Delete(path, true);
             Directory.CreateDirectory(path);
 
-            var session = new FilmSession(DicomUID.BasicFilmSessionSOPClass);
+            var session = new FilmSession(DicomUID.BasicFilmSession);
             var box = new FilmBox(session, null, DicomTransferSyntax.ImplicitVRLittleEndian);
-            box.BasicImageBoxes.Add(new ImageBox(box, DicomUID.BasicGrayscaleImageBoxSOPClass, null));
+            box.BasicImageBoxes.Add(new ImageBox(box, DicomUID.BasicGrayscaleImageBox, null));
             box.Save(path);
 
             Assert.True(File.Exists(Path.Combine(path, "FilmBox.dcm")));
@@ -39,9 +39,9 @@ namespace Dicom.Printing
 
             var expected = DicomUID.Generate();
 
-            var session = new FilmSession(DicomUID.BasicFilmSessionSOPClass);
+            var session = new FilmSession(DicomUID.BasicFilmSession);
             var box = new FilmBox(session, expected, DicomTransferSyntax.ImplicitVRLittleEndian);
-            box.BasicImageBoxes.Add(new ImageBox(box, DicomUID.BasicGrayscaleImageBoxSOPClass, null));
+            box.BasicImageBoxes.Add(new ImageBox(box, DicomUID.BasicGrayscaleImageBox, null));
             box.Save(path);
 
             var loaded = FilmBox.Load(session, path);

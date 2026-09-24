@@ -12,7 +12,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Dicom</RootNamespace>
     <AssemblyName>DICOM [Unit Tests]</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkProfile />
@@ -190,34 +190,24 @@
     <Compile Include="Network\Ports.cs" />
     <Compile Include="Printing\FilmBoxTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serialization\JsonDicomConverterTest.cs" />
     <Compile Include="StructuredReport\DicomContentItemTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DICOM.Native\x64\DICOM.Native64.vcxproj">
-      <Project>{fa9c7678-b9d9-46bc-8921-8152fd6787ca}</Project>
-      <Name>DICOM.Native64</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DICOM.Native\x86\DICOM.Native.vcxproj">
-      <Project>{c6148839-334d-4894-bdb9-e2d57438cf8a}</Project>
-      <Name>DICOM.Native</Name>
-    </ProjectReference>
+    <!-- Test what the products ship: DICOM.Desktop plus the prebuilt x64 native codecs (as DicomServer
+         references them). The Portable-based projects (Legacy, Json) are not used and no longer build. -->
     <ProjectReference Include="..\DICOM.Platform\Desktop\DICOM.Desktop.csproj">
       <Project>{59b38770-d2e7-40b9-8d27-a20691f1caa9}</Project>
       <Name>DICOM.Desktop</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Legacy\DICOM.Legacy.csproj">
-      <Project>{fcaae348-5d26-46cf-bfa3-c0b99c711b3d}</Project>
-      <Name>DICOM.Legacy</Name>
     </ProjectReference>
     <ProjectReference Include="..\Logging\DICOM.NLog.Desktop\DICOM.NLog.Desktop.csproj">
       <Project>{89075100-3f00-44fb-a1cc-f77c10a59667}</Project>
       <Name>DICOM.NLog.Desktop</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Serialization\DICOM.Json\DICOM.Json.csproj">
-      <Project>{849A140B-EF3E-4367-90BC-9F9383DC1481}</Project>
-      <Name>DICOM.Json</Name>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Dicom.Native64">
+      <HintPath>..\DICOM.Native\bin\x64\Release\DICOM.Native64\Dicom.Native64.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

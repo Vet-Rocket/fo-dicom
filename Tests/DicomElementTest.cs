@@ -71,14 +71,14 @@ namespace Dicom
         [Fact]
         public void DicomUnsignedShort_Array_ExplicitMinus1InterpretAs0()
         {
-            var element = new DicomUnsignedShort(DicomTag.ReferencedFrameNumbers, 1, 2, 3, 4, 5);
+            var element = new DicomUnsignedShort(DicomTag.ReferencedFrameNumbersRETIRED, 1, 2, 3, 4, 5);
             Assert.Equal(element.Get<ushort>(-1), element.Get<ushort>(0));
         }
 
         [Fact]
         public void DicomUnsignedShort_Array_ExplicitMinus2Throws()
         {
-            var element = new DicomUnsignedShort(DicomTag.ReferencedFrameNumbers, 1, 2, 3, 4, 5);
+            var element = new DicomUnsignedShort(DicomTag.ReferencedFrameNumbersRETIRED, 1, 2, 3, 4, 5);
             Assert.Throws<ArgumentOutOfRangeException>(() => element.Get<ushort>(-2));
         }
 
@@ -440,7 +440,7 @@ namespace Dicom
         public void TestDicomIntegerStringGetItem<T>()
         {
             var expected = 45;
-            var element = new DicomIntegerString(DicomTag.AttachedContours, 35, expected, 55);
+            var element = new DicomIntegerString(DicomTag.AttachedContoursRETIRED, 35, expected, 55);
             var actual = element.Get<T>(1);
             Assert.Equal((T)Convert.ChangeType(expected, Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T)), actual);
         }
@@ -448,7 +448,7 @@ namespace Dicom
         public void TestDicomIntegerStringGetArray<T>()
         {
             var expected = new[] { 35, 45, 55 };
-            var element = new DicomIntegerString(DicomTag.AttachedContours, expected);
+            var element = new DicomIntegerString(DicomTag.AttachedContoursRETIRED, expected);
             var actual = element.Get<T[]>();
             Assert.Equal(expected.Select(i => (T)Convert.ChangeType(i, Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T))), actual);
         }

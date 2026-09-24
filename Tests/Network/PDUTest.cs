@@ -56,7 +56,7 @@ namespace Dicom.Network
             DicomAssociation association = new DicomAssociation("testCalling", "testCalled");
             association.ExtendedNegotiations.Add(
                 new DicomExtendedNegotiation(
-                    DicomUID.StudyRootQueryRetrieveInformationModelFIND,
+                    DicomUID.StudyRootQueryRetrieveInformationModelFind,
                     new RootQueryRetrieveInfoFind(1, 1, 1, 1, null)));
 
             AAssociateRQ rq = new AAssociateRQ(association);
@@ -82,7 +82,7 @@ namespace Dicom.Network
             Assert.True(testAssociation.ExtendedNegotiations.Count == 1);
             Assert.True(
                 testAssociation.ExtendedNegotiations[0].SopClassUid
-                == DicomUID.StudyRootQueryRetrieveInformationModelFIND);
+                == DicomUID.StudyRootQueryRetrieveInformationModelFind);
 
             RootQueryRetrieveInfoFind info =
                 testAssociation.ExtendedNegotiations[0].SubItem as RootQueryRetrieveInfoFind;

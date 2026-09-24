@@ -198,7 +198,7 @@ namespace Dicom
         {
             ushort[] testValues = new ushort[] { 1, 2, 3, 4, 5 };
 
-            var element = new DicomUnsignedShort(DicomTag.ReferencedFrameNumbers, testValues);
+            var element = new DicomUnsignedShort(DicomTag.ReferencedFrameNumbersRETIRED, testValues);
 
             TestAddElementToDatasetAsString<ushort>(element, testValues);
         }
@@ -328,7 +328,247 @@ namespace Dicom
 
         #endregion
 
+        #region Character set encoding
+
+        // Text that no single-byte fallback can carry: Latin-1, Cyrillic, CJK. \u escapes keep the
+        // source file's own encoding out of it.
+        private const string Cyrillic = "Рентген";
+        private const string Latin = "Zoë";
+        private const string Mixed = "TEST^Zoë Рентген 犬";
+
+        private static readonly System.Text.Encoding Utf8 = DicomEncoding.GetEncoding("ISO_IR 192");
+        private static readonly System.Text.Encoding Latin1 = DicomEncoding.GetEncoding("ISO_IR 100");
+
+        [Fact]
+        public void SpecificCharacterSet_AddedAfterText_ReencodesLosslessly()
+        {
+            var ds = new DicomDataset();
+            ds.AddOrUpdate(DicomTag.StudyDescription, Cyrillic);
+            // until the character set is declared the bytes are ASCII, and reads reflect the bytes
+            Assert.Equal("???????", ds.Get<string>(DicomTag.StudyDescription));
+
+            ds.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 192");
+
+            AssertText(ds, DicomTag.StudyDescription, Cyrillic, Utf8);
+        }
+
+        [Fact]
+        public void SpecificCharacterSet_AddedAfterText_PersonNameAndMultiValueKeepValues()
+        {
+            var ds = new DicomDataset();
+            ds.AddOrUpdate(DicomTag.PatientName, Mixed);
+            ds.AddOrUpdate(DicomTag.OtherPatientIDs, Latin + "\\" + Cyrillic);
+
+            ds.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 192");
+
+            AssertText(ds, DicomTag.PatientName, Mixed, Utf8);
+            Assert.Equal(new[] { Latin, Cyrillic }, ds.Get<string[]>(DicomTag.OtherPatientIDs));
+        }
+
+        [Fact]
+        public void SpecificCharacterSet_ChangedTwice_StillLossless()
+        {
+            // Latin-1 cannot hold Cyrillic, so only the kept source text makes the second step lossless
+            var ds = new DicomDataset();
+            ds.AddOrUpdate(DicomTag.StudyDescription, Cyrillic);
+            ds.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 100");
+            ds.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 192");
+
+            AssertText(ds, DicomTag.StudyDescription, Cyrillic, Utf8);
+        }
+
+        [Fact]
+        public void SpecificCharacterSet_Changed_ElementBuiltFromBytesIsDecodedAndReencoded()
+        {
+            var ds = new DicomDataset();
+            ds.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 100");
+            ds.AddOrUpdate(new DicomLongString(DicomTag.StudyDescription, Latin1,
+                new IO.Buffer.MemoryByteBuffer(Latin1.GetBytes(Latin + " "))));
+
+            ds.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 192");
+
+            AssertText(ds, DicomTag.StudyDescription, Latin, Utf8);
+        }
+
+        [Fact]
+        public void SpecificCharacterSet_Changed_NonTextValuesUnchanged()
+        {
+            var ds = new DicomDataset();
+            ds.AddOrUpdate(DicomTag.StudyDate, "20260923");
+            ds.AddOrUpdate(DicomTag.StudyInstanceUID, "1.2.3.4");
+            ds.AddOrUpdate(DicomTag.Modality, "CR");
+
+            ds.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 192");
+
+            Assert.Equal("20260923", ds.Get<string>(DicomTag.StudyDate));
+            Assert.Equal("1.2.3.4", ds.Get<string>(DicomTag.StudyInstanceUID));
+            Assert.Equal("CR", ds.Get<string>(DicomTag.Modality));
+        }
+
+        [Fact]
+        public void SequenceItem_BuiltThenAttached_InheritsParentEncoding()
+        {
+            // the MWL Scheduled Procedure Step pattern: the item is filled before it is attached
+            var ds = new DicomDataset();
+            ds.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 192");
+            var item = new DicomDataset();
+            item.AddOrUpdate(DicomTag.ScheduledProcedureStepDescription, Cyrillic);
+
+            ds.AddOrUpdate(DicomTag.ScheduledProcedureStepSequence, item);
+
+            AssertText(FirstItem(ds, DicomTag.ScheduledProcedureStepSequence),
+                DicomTag.ScheduledProcedureStepDescription, Cyrillic, Utf8);
+        }
+
+        [Fact]
+        public void SequenceItem_AddedAfterSequenceAttached_InheritsParentEncoding()
+        {
+            var ds = new DicomDataset();
+            ds.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 192");
+            ds.AddOrUpdate(new DicomSequence(DicomTag.ScheduledProcedureStepSequence));
+            var item = new DicomDataset();
+            item.AddOrUpdate(DicomTag.ScheduledProcedureStepDescription, Cyrillic);
+
+            ds.Get<DicomSequence>(DicomTag.ScheduledProcedureStepSequence).Items.Add(item);
+            item.AddOrUpdate(DicomTag.ScheduledStationName, Latin);
+
+            AssertText(item, DicomTag.ScheduledProcedureStepDescription, Cyrillic, Utf8);
+            AssertText(item, DicomTag.ScheduledStationName, Latin, Utf8);
+        }
+
+        [Fact]
+        public void SequenceItem_ParentCharacterSetSetAfterAttach_Reencoded()
+        {
+            var ds = new DicomDataset();
+            var item = new DicomDataset();
+            item.AddOrUpdate(DicomTag.ScheduledProcedureStepDescription, Cyrillic);
+            ds.AddOrUpdate(DicomTag.ScheduledProcedureStepSequence, item);
+
+            ds.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 192");
+
+            AssertText(FirstItem(ds, DicomTag.ScheduledProcedureStepSequence),
+                DicomTag.ScheduledProcedureStepDescription, Cyrillic, Utf8);
+        }
+
+        [Fact]
+        public void SequenceItem_WithOwnCharacterSet_KeepsItAndChildrenInheritFromIt()
+        {
+            // PS3.5 7.5.3: an item's own Specific Character Set applies to it and its children
+            var ds = new DicomDataset();
+            ds.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 192");
+            var item = new DicomDataset();
+            item.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 100");
+            item.AddOrUpdate(DicomTag.ScheduledProcedureStepDescription, Latin);
+            var child = new DicomDataset();
+            child.AddOrUpdate(DicomTag.CodeMeaning, Latin);
+            item.AddOrUpdate(DicomTag.ScheduledProtocolCodeSequence, child);
+
+            ds.AddOrUpdate(DicomTag.ScheduledProcedureStepSequence, item);
+
+            AssertText(item, DicomTag.ScheduledProcedureStepDescription, Latin, Latin1);
+            AssertText(child, DicomTag.CodeMeaning, Latin, Latin1);
+
+            // and changing the parent's character set does not override the item's
+            ds.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 100");
+            ds.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 192");
+            AssertText(item, DicomTag.ScheduledProcedureStepDescription, Latin, Latin1);
+        }
+
+        [Fact]
+        public void Clone_SequenceItems_KeepEncodingAndOriginalUnaffected()
+        {
+            var ds = new DicomDataset();
+            ds.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 192");
+            var item = new DicomDataset();
+            item.AddOrUpdate(DicomTag.ScheduledProcedureStepDescription, Cyrillic);
+            ds.AddOrUpdate(DicomTag.ScheduledProcedureStepSequence, item);
+
+            var clone = ds.Clone();
+            AssertText(FirstItem(clone, DicomTag.ScheduledProcedureStepSequence),
+                DicomTag.ScheduledProcedureStepDescription, Cyrillic, Utf8);
+
+            clone.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 100");
+            AssertText(FirstItem(ds, DicomTag.ScheduledProcedureStepSequence),
+                DicomTag.ScheduledProcedureStepDescription, Cyrillic, Utf8);
+        }
+
+        [Fact]
+        public void Sequence_NotInADataset_LeavesItemsAlone()
+        {
+            var item = new DicomDataset();
+            item.AddOrUpdate(DicomTag.ScheduledProcedureStepDescription, Cyrillic);
+
+            var sequence = new DicomSequence(DicomTag.ScheduledProcedureStepSequence, item);
+
+            Assert.Single(sequence.Items);
+            Assert.Equal("???????", item.Get<string>(DicomTag.ScheduledProcedureStepDescription));
+        }
+
+        [Fact]
+        public void ReadBack_StringAddedToReceivedSequenceItem_UsesInheritedEncoding()
+        {
+            // reader-created items used to default to ASCII for anything added to them later
+            var ds = new DicomDataset();
+            ds.AddOrUpdate(DicomTag.SOPClassUID, DicomUID.SecondaryCaptureImageStorage);
+            ds.AddOrUpdate(DicomTag.SOPInstanceUID, DicomUID.Generate());
+            ds.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 192");
+            var item = new DicomDataset();
+            item.AddOrUpdate(DicomTag.ScheduledProcedureStepDescription, Cyrillic);
+            ds.AddOrUpdate(DicomTag.ScheduledProcedureStepSequence, item);
+
+            var stream = new System.IO.MemoryStream();
+            new DicomFile(ds).Save(stream);
+            stream.Position = 0;
+            var received = FirstItem(DicomFile.Open(stream).Dataset, DicomTag.ScheduledProcedureStepSequence);
+            received.AddOrUpdate(DicomTag.ScheduledStationName, Latin);
+
+            AssertText(received, DicomTag.ScheduledProcedureStepDescription, Cyrillic, Utf8);
+            AssertText(received, DicomTag.ScheduledStationName, Latin, Utf8);
+        }
+
+        [Fact]
+        public void UniversalResource_AlwaysDefaultRepertoire()
+        {
+            // PS3.5 6.1.2.2: UR is not affected by Specific Character Set
+            const string url = "https://example.com/wado?studyUID=1.2.3";
+            var ds = new DicomDataset();
+            ds.AddOrUpdate(DicomTag.SpecificCharacterSet, "ISO_IR 192");
+            ds.AddOrUpdate(DicomTag.RetrieveURL, url);
+
+            Assert.Equal(DicomEncoding.Default, ds.Get<DicomUniversalResource>(DicomTag.RetrieveURL).Encoding);
+            Assert.Equal(url, ds.Get<string>(DicomTag.RetrieveURL));
+
+            ds.AddOrUpdate(DicomTag.SOPClassUID, DicomUID.SecondaryCaptureImageStorage);
+            ds.AddOrUpdate(DicomTag.SOPInstanceUID, DicomUID.Generate());
+            var stream = new System.IO.MemoryStream();
+            new DicomFile(ds).Save(stream);
+            stream.Position = 0;
+            var read = DicomFile.Open(stream).Dataset;
+            Assert.Equal(DicomEncoding.Default, read.Get<DicomUniversalResource>(DicomTag.RetrieveURL).Encoding);
+            Assert.Equal(url, read.Get<string>(DicomTag.RetrieveURL));
+        }
+
+        #endregion
+
         #region Support methods
+
+        /// <summary>
+        /// Asserts both the decoded value and the stored bytes (DICOM padding stripped), since a
+        /// correct-looking label over wrongly encoded bytes is exactly the failure being guarded.
+        /// </summary>
+        private static void AssertText(DicomDataset ds, DicomTag tag, string expected, System.Text.Encoding encoding)
+        {
+            Assert.Equal(expected, ds.Get<string>(tag));
+            byte[] raw = ds.Get<byte[]>(tag);
+            int length = raw.Length;
+            while (length > 0 && (raw[length - 1] == 0x20 || raw[length - 1] == 0x00)) length--;
+            Assert.Equal(BitConverter.ToString(encoding.GetBytes(expected)), BitConverter.ToString(raw, 0, length));
+        }
+
+        private static DicomDataset FirstItem(DicomDataset ds, DicomTag sequenceTag)
+        {
+            return ds.Get<DicomSequence>(sequenceTag).Items[0];
+        }
 
         private void TestAddElementToDatasetAsString<T>(DicomElement element, T[] testValues)
         {
