@@ -1257,7 +1257,8 @@ namespace Dicom
             if (vr == DicomVR.UR)
             {
                 if (values == null) return DoAdd(new DicomUniversalResource(tag, DicomEncoding.Default, EmptyBuffer.Value), allowUpdate);
-                if (typeof(T) == typeof(string)) return DoAdd(new DicomUniversalResource(tag, DataSetEncoding, values.Cast<string>().First()), allowUpdate);
+                //UR is not affected by Specific Character Set (PS3.5 6.1.2.2): always the default repertoire
+                if (typeof(T) == typeof(string)) return DoAdd(new DicomUniversalResource(tag, DicomEncoding.Default, values.Cast<string>().First()), allowUpdate);
             }
 
             if (vr == DicomVR.US)

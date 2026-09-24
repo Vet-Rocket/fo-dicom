@@ -125,7 +125,8 @@ namespace Dicom.IO.Reader
                     element = new DicomUnknown(tag, data);
                     break;
                 case "UR":
-                    element = new DicomUniversalResource(tag, _encodings.Peek(), data);
+                    //UR is not affected by Specific Character Set (PS3.5 6.1.2.2): always the default repertoire
+                    element = new DicomUniversalResource(tag, DicomEncoding.Default, data);
                     break;
                 case "US":
                     element = new DicomUnsignedShort(tag, data);
